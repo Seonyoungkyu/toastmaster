@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">ToastMaster</string>
+    <string name="app_name_timer">TM Timer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Samsung One Toast Master</string>
+    <string name="nav_header_subtitle">www.toastmasters.org</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_test_mode">Chang to test mode</string>
+    <string name="action_normal_mode">Chang to normal mode</string>
+
+    <string name="menu_meeting">Meeting</string>
+    <string name="menu_roles">Role Guide</string>
+    <string name="menu_timer">ToastMaster Timer</string>
+    <string name="menu_vote">Vote</string>
+    <string name="menu_stats">Statistics</string>
+
+</resources>

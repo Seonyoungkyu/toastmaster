@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_meeting"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/menu_meeting" />
+        <item
+            android:id="@+id/nav_timer"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/menu_timer" />
+        <item
+            android:id="@+id/nav_vote"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_vote" />
+        <item
+            android:id="@+id/nav_roles"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_roles" />
+        <item
+            android:id="@+id/nav_stats"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_stats" />
+    </group>
+</menu>
