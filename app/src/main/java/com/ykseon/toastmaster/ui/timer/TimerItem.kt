@@ -14,7 +14,7 @@ val timerList = arrayListOf(
     TimerItem("Speaker", "11-12-13"),
     TimerItem("TableTopic", "1-2"),
     TimerItem("Evaluator", "2-3"),
-    TimerItem("", ""),
+    TimerItem("Custom", ""),
     TimerItem("Debate", "1-2"),
     TimerItem("Debate", "2-3"),
     TimerItem("Debate", "3-4"),

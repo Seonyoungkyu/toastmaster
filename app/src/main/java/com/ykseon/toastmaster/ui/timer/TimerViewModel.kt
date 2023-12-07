@@ -1,6 +1,7 @@
 package com.ykseon.toastmaster.ui.timer
 
 import android.graphics.Color
+import android.util.TypedValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.common.SharedState
@@ -27,6 +28,7 @@ class TimerViewModel @Inject constructor(
     private val initState = 0.toTimerState(cutOffTimes)
     private var timeTickUnit = 1000
     private val _currentTime = MutableStateFlow<TimerState>(initState)
+    var defaultBackgroundColor: Int = Color.LTGRAY
     val currentTime = _currentTime.asStateFlow()
     val timeText =
         _currentTime
@@ -52,8 +54,8 @@ class TimerViewModel @Inject constructor(
     val backgroundColor =
         _currentTime.map {
             when (it) {
-                is TimerState.Initialized -> Color.WHITE
-                is TimerState.Ready -> Color.WHITE
+                is TimerState.Initialized -> defaultBackgroundColor
+                is TimerState.Ready -> defaultBackgroundColor
                 is TimerState.Green -> Color.GREEN
                 is TimerState.Yellow -> Color.YELLOW
                 is TimerState.Red -> Color.RED

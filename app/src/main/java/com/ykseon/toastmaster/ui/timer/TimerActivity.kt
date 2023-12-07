@@ -1,7 +1,9 @@
 package com.ykseon.toastmaster.ui.timer
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.PowerManager
+import android.util.TypedValue
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +24,9 @@ class TimerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = TimerActivityMainBinding.inflate(layoutInflater)
-        binding.viewModel = timerViewModel
+        binding.viewModel = timerViewModel.apply {
+            defaultBackgroundColor = getDefaultBackgroundColor()
+        }
         binding.lifecycleOwner = this
         setContentView(binding.root)
         // 시스템 UI를 숨깁니다.
@@ -38,4 +42,10 @@ class TimerActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    private fun getDefaultBackgroundColor(): Int {
+        val typedValue = TypedValue()
+        val result = theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)
+        return if (result) typedValue.data
+        else Color.LTGRAY
+    }
 }
