@@ -1,20 +1,44 @@
 package com.ykseon.toastmaster.ui.timer
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ykseon.toastmaster.databinding.TimerItemBinding
 import androidx.recyclerview.widget.DiffUtil
 
 class TimerListAdapter(
-    private val viewModel:TimerFragmentViewModel
+    private val viewModel:TimerFragmentViewModel,
+    private val fragmentManager: FragmentManager?
 ) : ListAdapter<TimerItem, TimerListAdapter.ItemViewHolder>(ItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val binding = TimerItemBinding.inflate(LayoutInflater.from(parent.context), null, false )
         binding.timerItem.setOnClickListener {
-            viewModel.buttonClick(parent, binding.role.text.toString(), binding.cutoffList.text.toString())
+
+            if (binding.role.text.isEmpty() || binding.cutoffList.text.isEmpty()) {
+                val dialog = CustomTimerDialog(object: CustomTimerDialogCallback {
+                    override fun onYesButtonClick(role: String, cutOffs: String) {
+                        viewModel.startTimer(
+                            parent,
+                            role,
+                            cutOffs
+                        )
+                    }
+                })
+                dialog.show(fragmentManager!!, "Timer Input Dialog")
+            }
+            else {
+                viewModel.startTimer(
+                    parent,
+                    binding.role.text.toString(),
+                    binding.cutoffList.text.toString()
+                )
+            }
         }
         return ItemViewHolder(binding)
     }
