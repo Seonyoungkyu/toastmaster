@@ -7,10 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -146,8 +142,10 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
     val density = LocalDensity.current.density
     var globalOffset by remember { mutableStateOf(Offset(0F, 0F))}
     var longPressCount by remember { mutableIntStateOf(0) }
-
+    var record by remember {mutableStateOf(TimerRecordItem(TimerItem("","")))}
     Log.i(TAG,"TimerList - TimerCard id(${recordItem.id}) hash(${recordItem.hashCode()})")
+
+    record = recordItem
 
     Card(
         modifier = Modifier
@@ -162,7 +160,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                         longPressCount += 1
                         val rawX = (offset.x + globalOffset.x)
                         val rawY = (offset.y + globalOffset.y)
-                        Log.i(TAG, "TimerList - LongPress (${recordItem.id}) hash(${recordItem.hashCode()})")
+                        Log.i(TAG, "TimerList - LongPress (${record.id}) hash(${record.hashCode()})")
                         ContextMenuPopup(
                             context = context,
                             items = arrayListOf(
@@ -174,19 +172,19 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                                     popup.dismiss()
                                 }
                             ),
-                            recordItem.id
+                            record.id
                         ).show(rawX.toInt(), rawY.toInt())
                     },
                     onTap = {
-                        Log.i(TAG, "TimerList - Press (${recordItem.id}) hash(${recordItem.hashCode()})")
-                        viewModel.startTimer(context, recordItem.item.role, recordItem.item.cutoffs)
+                        Log.i(TAG, "TimerList - Press (${record.id}) hash(${record.hashCode()})")
+                        viewModel.startTimer(context, record.item.role, record.item.cutoffs)
                     }
                 )
             },
         shape = RoundedCornerShape(8.dp),
         backgroundColor = viewModel.getBgColor(
-            recordItem.item.role, isSystemInDarkTheme(),
-            recordItem.item.cutoffs.replace("-","").toInt()
+            record.item.role, isSystemInDarkTheme(),
+            record.item.cutoffs.replace("-","").toInt()
         ),
     ) {
         Column(
@@ -197,7 +195,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
 
         ) {
             Text(
-                text = recordItem.item.role,
+                text = record.item.role,
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = MaterialTheme.typography.body1.fontSize,
@@ -206,7 +204,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
             )
 
             Text(
-                text = recordItem.item.cutoffs,
+                text = record.item.cutoffs,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = MaterialTheme.typography.body2.fontSize,
