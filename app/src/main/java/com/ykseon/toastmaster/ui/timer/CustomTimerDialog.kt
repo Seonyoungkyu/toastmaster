@@ -42,10 +42,10 @@ class CustomTimerDialog(
 
         // 확인 버튼 클릭
         binding.okButton.setOnClickListener {
-            this.confirmDialogInterface?.onYesButtonClick( "*Speaker*",
-                binding.spinner1.selectedItem as String + "-" +
-                        binding.spinner2.selectedItem as String + "-" +
-                        binding.spinner3.selectedItem as String
+            this.confirmDialogInterface?.onYesButtonClick( binding.roleEdit.text.toString(),
+                binding.spinner1.selectedItem.extractMinute() + "-" +
+                        binding.spinner2.selectedItem.extractMinute() + "-" +
+                        binding.spinner3.selectedItem.extractMinute()
             )
             dismiss()
         }
@@ -57,6 +57,10 @@ class CustomTimerDialog(
         super.onDestroyView()
         _binding = null
     }
+
+    private fun Any.extractMinute() =
+        (this as String).split(' ')[0]
+
 }
 
 interface CustomTimerDialogCallback {

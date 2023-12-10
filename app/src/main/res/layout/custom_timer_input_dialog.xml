@@ -22,13 +22,37 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Role"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                tools:ignore="RtlCompat" />
+
+            <EditText
+                android:id="@+id/role_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="100dp"
+                android:textSize="20sp"
+                android:autofillHints="Speaker" />
+
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="GREEN"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
@@ -36,7 +60,7 @@
                 android:id="@+id/spinner1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
+                android:layout_marginStart="100dp"
                 android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
@@ -52,8 +76,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="YELLO"
-                android:textSize="25sp"
+                android:text="YELLOW"
+                android:textSize="20sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
@@ -61,7 +85,7 @@
                 android:id="@+id/spinner2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
+                android:layout_marginStart="100dp"
                 android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
@@ -78,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="RED"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
@@ -86,7 +110,7 @@
                 android:id="@+id/spinner3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="100dp"
+                android:layout_marginStart="100dp"
                 android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
@@ -102,7 +126,7 @@
         <Button
             android:id="@+id/cancel_buttonButton"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginEnd="7dp"
             android:layout_weight="1"
             android:text="@string/cancel"
@@ -111,7 +135,7 @@
         <Button
             android:id="@+id/ok_button"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
             android:text="@string/ok"
             android:textSize="14sp" />

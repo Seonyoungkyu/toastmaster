@@ -13,7 +13,6 @@ import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.databinding.TimerActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class TimerActivity : AppCompatActivity() {
 
