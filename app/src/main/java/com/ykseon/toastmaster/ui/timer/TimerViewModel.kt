@@ -1,7 +1,6 @@
 package com.ykseon.toastmaster.ui.timer
 
 import android.graphics.Color
-import android.util.TypedValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.common.SharedState
@@ -10,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -35,10 +35,20 @@ class TimerViewModel @Inject constructor(
             .map{"${toTwoDigits(it.info.minute)}:${toTwoDigits(it.info.second)}"}
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
 
+    // region color change
+    private val _backgroundColor = MutableStateFlow(calculateEndColor(_currentTime.value))
+    val backgroundColor: StateFlow<Int> = _backgroundColor
+    private var colorTransitionJob: Job? = null
+    // endregion
+
+    var animIconMovingSpan = 0
+
     init {
         sharedState.testMode.onEach {
             timeTickUnit = if (it) 50 else 1000
         }.launchIn(viewModelScope)
+
+        observeTimeChanges()
     }
 
     val progress = _currentTime.map {
@@ -51,17 +61,69 @@ class TimerViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
-    val backgroundColor =
+    val animationTranslation = _currentTime.map {
+        if (cutOffTimes.size == 4) {
+            val current = it.info.minute * 60 + it.info.second
+            val max = cutOffTimes[3]
+            animIconMovingSpan * current / max
+        } else {
+            0
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+
+    val timeTextColor =
         _currentTime.map {
             when (it) {
-                is TimerState.Initialized -> defaultBackgroundColor
-                is TimerState.Ready -> defaultBackgroundColor
-                is TimerState.Green -> Color.GREEN
-                is TimerState.Yellow -> Color.YELLOW
-                is TimerState.Red -> Color.RED
-                is TimerState.Expired -> Color.DKGRAY
+                is TimerState.Expired -> Color.LTGRAY
+                else -> Color.DKGRAY
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Color.WHITE)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Color.DKGRAY)
+
+    private fun observeTimeChanges() {
+        _currentTime
+            .onEach { state ->
+                colorTransitionJob?.cancel()
+                colorTransitionJob = viewModelScope.launch {
+                    val startColor = _backgroundColor.value
+                    val endColor = calculateEndColor(state)
+                    if (startColor != endColor)
+                        animateColorTransition(startColor, endColor, 200, 20)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun animateColorTransition(startColor: Int, endColor: Int, duration: Long, interval: Long) {
+        var elapsed = 0L
+        while (elapsed < duration) {
+            val fraction = elapsed.toFloat() / duration.toFloat()
+            val currentColor = mixColors(startColor, endColor, fraction)
+            _backgroundColor.value = currentColor
+            delay(interval)
+            elapsed += interval
+        }
+        _backgroundColor.value = endColor
+    }
+
+    private fun calculateEndColor(state: TimerState): Int {
+        return when (state) {
+            is TimerState.Initialized -> Color.LTGRAY
+            is TimerState.Ready -> Color.LTGRAY
+            is TimerState.Green -> Color.GREEN
+            is TimerState.Yellow -> Color.YELLOW
+            is TimerState.Red -> Color.RED
+            is TimerState.Expired -> Color.DKGRAY
+        }
+    }
+
+    private fun mixColors(startColor: Int, endColor: Int, fraction: Float): Int {
+        val alpha = (Color.alpha(startColor) * (1 - fraction) + Color.alpha(endColor) * fraction).toInt()
+        val red = (Color.red(startColor) * (1 - fraction) + Color.red(endColor) * fraction).toInt()
+        val green = (Color.green(startColor) * (1 - fraction) + Color.green(endColor) * fraction).toInt()
+        val blue = (Color.blue(startColor) * (1 - fraction) + Color.blue(endColor) * fraction).toInt()
+        return Color.argb(alpha, red, green, blue)
+    }
+
 
     private var timerJob: Job? = null
 

@@ -15,7 +15,6 @@
         android:minWidth="300dp"
         android:orientation="vertical"
         android:padding="20dp">
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,14 +29,13 @@
                 android:textSize="20sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
-
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/role_edit"
-                android:layout_width="match_parent"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:textSize="20sp"
-                android:autofillHints="Speaker" />
+                android:hint="Type here..."
+                android:inputType="text" />
 
         </FrameLayout>
         <FrameLayout
@@ -52,18 +50,18 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="GREEN"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner1"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
+
         </FrameLayout>
         <FrameLayout
             android:layout_width="match_parent"
@@ -77,16 +75,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="YELLOW"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner2"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
         </FrameLayout>
@@ -102,16 +99,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="RED"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner3"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:background="@android:drawable/btn_dropdown"
                 android:entries="@array/spinnerItems"
                 android:spinnerMode="dropdown" />
         </FrameLayout>

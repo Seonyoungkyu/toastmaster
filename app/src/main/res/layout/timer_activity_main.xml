@@ -25,6 +25,7 @@
             android:textAlignment="center"
             android:textSize="60sp"
             android:text="@{viewModel.timeText}"
+            android:textColor="@{safeUnbox(viewModel.timeTextColor)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -56,24 +57,36 @@
             app:layout_constraintEnd_toEndOf="parent"
             />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:scaleY="3"
-            android:max="1000"
-            android:min="0"
-            android:progress="@{viewModel.progress}"
-            android:progressDrawable="@drawable/custom_progress_bar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.034" />
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="center_vertical"
+                android:scaleY="3"
+                android:max="1000"
+                android:min="0"
+                android:progress="@{viewModel.progress}"
+                android:progressDrawable="@drawable/custom_progress_bar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.034" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:lottie_fileName="girl-cycling-in-autumn.json"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                />
+        </FrameLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

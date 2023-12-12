@@ -70,6 +70,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:1.5.4")
     implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("com.airbnb.android:lottie:5.0.3")
     ksp("androidx.room:room-compiler:2.6.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

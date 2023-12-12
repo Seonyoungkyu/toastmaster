@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -66,7 +67,8 @@ class ContextMenuPopup(
         binding?.let {windowManager?.addView(it.root, getLayoutParams(posX, posY)) }
     }
     fun show(x: Int, y: Int) {
-        create(x,y)
+        if (Settings.canDrawOverlays(context))
+            create(x,y)
     }
 
     fun dismiss() {

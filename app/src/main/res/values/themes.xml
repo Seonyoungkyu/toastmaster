@@ -14,12 +14,12 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.ToastMaster.NoActionBar">
+    <style name="Theme.ToastMaster.NoActionBar" parent="Theme.ToastMaster">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
     <style name="Theme.ToastMaster.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.ToastMaster.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.ToastMaster.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
 </resources>

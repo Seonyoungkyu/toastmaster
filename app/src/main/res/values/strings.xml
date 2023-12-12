@@ -6,8 +6,8 @@
     <string name="nav_header_title">Samsung One Toast Master</string>
     <string name="nav_header_subtitle">www.toastmasters.org</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_test_mode">Chang to test mode</string>
-    <string name="action_normal_mode">Chang to normal mode</string>
+    <string name="action_test_mode">Change to test mode</string>
+    <string name="action_normal_mode">Change to normal mode</string>
 
     <string name="menu_meeting">Meeting</string>
     <string name="menu_roles">Role Guide</string>

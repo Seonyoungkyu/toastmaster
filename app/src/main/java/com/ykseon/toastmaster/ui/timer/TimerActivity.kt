@@ -2,16 +2,20 @@ package com.ykseon.toastmaster.ui.timer
 
 import android.graphics.Color
 import android.os.Bundle
-import android.os.PowerManager
 import android.util.TypedValue
 import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat.getInsetsController
 import androidx.core.view.WindowInsetsCompat
-import com.ykseon.toastmaster.R
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.lifecycleScope
 import com.ykseon.toastmaster.databinding.TimerActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class TimerActivity : AppCompatActivity() {
@@ -28,7 +32,7 @@ class TimerActivity : AppCompatActivity() {
         }
         binding.lifecycleOwner = this
         setContentView(binding.root)
-        // 시스템 UI를 숨깁니다.
+
         val windowInsetsController = getInsetsController(window,window.decorView)
         windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
 
@@ -39,8 +43,25 @@ class TimerActivity : AppCompatActivity() {
         timerViewModel.startButtonClick()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // Parent View의 크기를 측정하고 ViewModel에 전달
+        binding.root.doOnPreDraw {
+            timerViewModel.animIconMovingSpan = binding.root.width
+        }
+
+        moveAnimationIcon()
     }
 
+    private fun moveAnimationIcon() {
+
+        timerViewModel.animationTranslation.onEach { x ->
+            binding.lottie.let {
+                it.updateLayoutParams<FrameLayout.LayoutParams> {
+                    leftMargin = x
+                }
+            }
+        }.launchIn(lifecycleScope)
+    }
     private fun getDefaultBackgroundColor(): Int {
         val typedValue = TypedValue()
         val result = theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)

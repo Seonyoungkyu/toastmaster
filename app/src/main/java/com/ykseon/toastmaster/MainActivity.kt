@@ -4,8 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -56,12 +59,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // Check if Android M or higher
-        // Check if Android M or higher
-        // Show alert dialog to the user saying a separate permission is needed
-        // Launch the settings activity if the user prefers
-//        val myIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-//        startActivity(myIntent)
         checkPermission()
     }
 
@@ -90,13 +87,24 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun checkPermission() {
+    private fun checkPermission() {
         if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
+
+            val snackbar = Snackbar.make(
+                this.window.decorView,
+                "This application need 'appear on top' permission",
+                Snackbar.LENGTH_INDEFINITE
             )
-            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+
+            snackbar.setAction("OK") {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+            }
+
+            snackbar.show()
         }
     }
 
