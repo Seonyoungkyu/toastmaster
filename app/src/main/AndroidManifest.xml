@@ -28,8 +28,14 @@
 
         <activity
             android:name=".ui.timer.TimerActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.ToastMaster.NoActionBar">
+        </activity>
+        <activity
+            android:name=".ui.record.RecordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+            >
         </activity>
     </application>
 

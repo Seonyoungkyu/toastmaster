@@ -10,7 +10,7 @@ val Typography = Typography(
     h1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 18.sp
+        fontSize = 16.sp
     ),
     h2 = TextStyle(
         fontFamily = FontFamily.Default,

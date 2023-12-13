@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:minWidth="300dp"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:fitsSystemWindows="false"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:minWidth="300dp"
         android:orientation="vertical"
         android:padding="20dp">
         <FrameLayout
@@ -20,18 +20,42 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="10dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="Role"
-                android:textSize="20sp"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                tools:ignore="RtlCompat" />
+
+            <Spinner
+                android:id="@+id/role_spinner"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="100dp"
+                android:entries="@array/roles"
+                android:spinnerMode="dropdown" />
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Name"
+                android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
             <AutoCompleteTextView
-                android:id="@+id/role_edit"
-                android:layout_width="180dp"
+                android:id="@+id/name_edit"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
                 android:hint="Type here..."
@@ -43,20 +67,20 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="GREEN"
+                android:text="Green"
                 android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner1"
-                android:layout_width="180dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
                 android:entries="@array/spinnerItems"
@@ -68,20 +92,20 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="YELLOW"
+                android:text="Yellow"
                 android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner2"
-                android:layout_width="180dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
                 android:entries="@array/spinnerItems"
@@ -92,20 +116,20 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="RED"
+                android:text="Red"
                 android:textSize="16sp"
                 android:textAlignment="center"
                 tools:ignore="RtlCompat" />
 
             <Spinner
                 android:id="@+id/spinner3"
-                android:layout_width="180dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
                 android:entries="@array/spinnerItems"
@@ -116,7 +140,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <Button

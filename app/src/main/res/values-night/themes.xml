@@ -16,6 +16,7 @@
     <style name="Theme.ToastMaster.NoActionBar" parent="Theme.ToastMaster">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowDisablePreview">true</item>
     </style>
     <style name="Theme.ToastMaster.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

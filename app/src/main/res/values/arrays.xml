@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="roles">
+        <item>Speaker</item>
+        <item>Evaluator</item>
+        <item>Table Topic</item>
+        <item>Debate</item>
+    </string-array>
     <string-array name="spinnerItems">
         <item>Unspecified</item>
         <item>1 min</item>
@@ -14,8 +20,19 @@
         <item>10 min</item>
         <item>11 min</item>
         <item>12 min</item>
+        <item>13 min</item>
+        <item>14 min</item>
         <item>15 min</item>
+        <item>16 min</item>
+        <item>17 min</item>
+        <item>18 min</item>
+        <item>19 min</item>
         <item>20 min</item>
+        <item>25 min</item>
+        <item>30 min</item>
+        <item>40 min</item>
+        <item>50 min</item>
+        <item>60 min</item>
         <item>30 min</item>
     </string-array>
 </resources>

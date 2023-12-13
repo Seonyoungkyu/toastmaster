@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:background="@drawable/rounded_button"
+    android:orientation="vertical"
     >
 
 </androidx.appcompat.widget.LinearLayoutCompat>

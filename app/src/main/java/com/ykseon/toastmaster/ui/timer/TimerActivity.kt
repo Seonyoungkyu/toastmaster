@@ -3,8 +3,10 @@ package com.ykseon.toastmaster.ui.timer
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat.getInsetsController
@@ -37,19 +39,36 @@ class TimerActivity : AppCompatActivity() {
         windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
 
         val role = checkNotNull(intent.getStringExtra("role"))
+        val name = checkNotNull(intent.getStringExtra("name"))
         val cutoffs = checkNotNull(intent.getStringExtra("cutoffs"))
 
-        timerViewModel.setRoleAndCutoffs(role, cutoffs)
-        timerViewModel.startButtonClick()
+        timerViewModel.setRoleAndCutoffs(role, name, cutoffs)
+        if(savedInstanceState == null) timerViewModel.startButtonClick()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Parent View의 크기를 측정하고 ViewModel에 전달
         binding.root.doOnPreDraw {
             timerViewModel.animIconMovingSpan = binding.root.width
         }
 
+        binding.timeText.setOnClickListener {
+            val visible = binding.headerInfo.visibility == View.VISIBLE
+            binding.headerInfo.animate()
+                .alpha(if (visible) 0f else 1f)
+                .setDuration(300)
+                .withEndAction {
+                    binding.headerInfo.visibility = if (visible) View.INVISIBLE else View.VISIBLE
+                }
+                .start()
+        }
         moveAnimationIcon()
+        showRecordToast()
+    }
+
+    private fun showRecordToast() {
+        timerViewModel.recordToastShow.onEach{message ->
+            Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
+        }.launchIn(lifecycleScope)
     }
 
     private fun moveAnimationIcon() {

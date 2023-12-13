@@ -4,12 +4,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,7 +17,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.ykseon.toastmaster.common.SharedState
+import com.ykseon.toastmaster.common.SortOption
 import com.ykseon.toastmaster.databinding.ActivityMainBinding
+import com.ykseon.toastmaster.ui.record.RecordActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -69,8 +69,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        if(item.itemId == R.id.action_test_mode ) {
+        if(item.itemId == R.id.action_show_record ) {
+            ContextCompat.startActivity(
+                this,
+                Intent(this, RecordActivity::class.java),
+                null
+            )
+        }
+        else if(item.itemId == R.id.action_test_mode ) {
             sharedState.testMode.value = !sharedState.testMode.value
             if(sharedState.testMode.value) {
                 item.title = resources.getString(R.string.action_normal_mode)
@@ -78,6 +84,15 @@ class MainActivity : AppCompatActivity() {
             else {
                 item.title = resources.getString(R.string.action_test_mode)
             }
+        }
+        else if (item.itemId == R.id.action_sort_name) {
+            sharedState.sortOption.value = SortOption.ALPHABETICAL
+        }
+        else if (item.itemId == R.id.action_sort_role) {
+            sharedState.sortOption.value = SortOption.ROLE
+        }
+        else if (item.itemId == R.id.action_sort_creation) {
+            sharedState.sortOption.value = SortOption.CREATION
         }
         return super.onOptionsItemSelected(item)
     }

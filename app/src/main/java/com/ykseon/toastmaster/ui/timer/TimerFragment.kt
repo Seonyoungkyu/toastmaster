@@ -10,12 +10,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,6 +26,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -40,15 +44,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.common.CREATION_SYSTEM_ROLE
 import com.ykseon.toastmaster.ui.contextmenu.ContextMenuItem
 import com.ykseon.toastmaster.ui.contextmenu.ContextMenuPopup
@@ -124,7 +130,9 @@ fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
         onClick = { viewModel.createTimer() },
     ) {
         Text(
-            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center),
             text = "+",
             style = TextStyle(
                 fontWeight = FontWeight.Normal,
@@ -139,10 +147,9 @@ fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
 @Composable
 fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
     val context = LocalView.current.context
-    val density = LocalDensity.current.density
     var globalOffset by remember { mutableStateOf(Offset(0F, 0F))}
     var longPressCount by remember { mutableIntStateOf(0) }
-    var record by remember {mutableStateOf(TimerRecordItem(TimerItem("","")))}
+    var record by remember {mutableStateOf(TimerRecordItem(TimerItem("","", "")))}
     Log.i(TAG,"TimerList - TimerCard id(${recordItem.id}) hash(${recordItem.hashCode()})")
 
     record = recordItem
@@ -160,15 +167,25 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                         longPressCount += 1
                         val rawX = (offset.x + globalOffset.x)
                         val rawY = (offset.y + globalOffset.y)
-                        Log.i(TAG, "TimerList - LongPress (${record.id}) hash(${record.hashCode()})")
+                        Log.i(
+                            TAG,
+                            "TimerList - LongPress (${record.id}) hash(${record.hashCode()})"
+                        )
                         ContextMenuPopup(
                             context = context,
                             items = arrayListOf(
                                 ContextMenuItem(
-                                    "Delete",
+                                    context.resources.getString(R.string.context_menu_delete),
                                 ) { popup, obj ->
                                     val id = (obj as Long)
-                                    viewModel.deleteItem(id)
+                                    viewModel.deleteTimer(id)
+                                    popup.dismiss()
+                                },
+                                ContextMenuItem(
+                                    context.resources.getString(R.string.context_menu_edit),
+                                ) { popup, obj ->
+                                    val id = (obj as Long)
+                                    viewModel.editTimer(id)
                                     popup.dismiss()
                                 }
                             ),
@@ -177,7 +194,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                     },
                     onTap = {
                         Log.i(TAG, "TimerList - Press (${record.id}) hash(${record.hashCode()})")
-                        viewModel.startTimer(context, record.item.role, record.item.cutoffs)
+                        viewModel.startTimer(context, record.item.role, record.item.name, record.item.cutoffs)
                     }
                 )
             },
@@ -187,6 +204,16 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
             record.item.cutoffs.replace("-","").toInt()
         ),
     ) {
+        Box(
+            modifier = Modifier.wrapContentSize(align = Alignment.TopStart)
+        ) {
+            Icon(
+                modifier = Modifier.requiredSize(30.dp),
+                painter = painterResource(id = viewModel.getIconId(recordItem)),
+                contentDescription = "speaker icon",
+            )
+        }
+
         Column(
             modifier = Modifier
                 .wrapContentSize(),
@@ -195,12 +222,13 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
 
         ) {
             Text(
-                text = record.item.role,
+                text = record.item.name,
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = MaterialTheme.typography.body1.fontSize,
                     color = MaterialTheme.colors.onSurface
-                )
+                ),
+                overflow = TextOverflow.Ellipsis
             )
 
             Text(
@@ -218,5 +246,41 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
 @Preview
 @Composable
 fun MainContent() {
-    TimerGridView(viewModel = TimerFragmentViewModel())
+    Card(modifier = Modifier.size(120.dp)) {
+        
+        Box(
+            modifier = Modifier.wrapContentSize(align = Alignment.TopStart)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_speaker_foreground),
+                modifier = Modifier.requiredSize(30.dp),
+                contentDescription = "speaker icon",
+            )
+        }
+        Column(
+            modifier = Modifier
+                .wrapContentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+
+        ) {
+            Text(
+                text = "aa",
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = MaterialTheme.typography.body1.fontSize,
+                    color = MaterialTheme.colors.onSurface
+                )
+            )
+
+            Text(
+                text = "BB",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = MaterialTheme.typography.body2.fontSize,
+                    color = MaterialTheme.colors.onSurface
+                )
+            )
+        }
+    }
 }

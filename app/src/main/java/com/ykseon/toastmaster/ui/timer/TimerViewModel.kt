@@ -1,16 +1,22 @@
 package com.ykseon.toastmaster.ui.timer
 
 import android.graphics.Color
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.common.SharedState
+import com.ykseon.toastmaster.model.TimeRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -18,21 +24,34 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG = "TimerViewModel"
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    sharedState: SharedState
+    val sharedState: SharedState
 ): ViewModel() {
 
     private val defaultCutOffs = arrayListOf<Int>(5,10,15,20)
     private var cutOffTimes = defaultCutOffs
+    private var timeTickUnit = 50
+    private var timeMultiply = 1
     private val initState = 0.toTimerState(cutOffTimes)
-    private var timeTickUnit = 1000
     private val _currentTime = MutableStateFlow<TimerState>(initState)
-    var defaultBackgroundColor: Int = Color.LTGRAY
     val currentTime = _currentTime.asStateFlow()
+    private var greenMarginalTime = 0
+    private var redMarginalTime = 0
+
+    private lateinit var role: String
+    lateinit var name: String
+    lateinit var cutoffs: String
+
+    var defaultBackgroundColor: Int = Color.LTGRAY
     val timeText =
         _currentTime
-            .map{"${toTwoDigits(it.info.minute)}:${toTwoDigits(it.info.second)}"}
+            .distinctUntilChanged {
+                    old, new ->
+                old.info.minute == new.info.minute && old.info.second == new.info.second
+            }
+            .map{it.info.makeTimeString()}
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
 
     // region color change
@@ -43,18 +62,21 @@ class TimerViewModel @Inject constructor(
 
     var animIconMovingSpan = 0
 
+
     init {
         sharedState.testMode.onEach {
-            timeTickUnit = if (it) 50 else 1000
+            timeMultiply = if (it) 10 else 1
         }.launchIn(viewModelScope)
 
         observeTimeChanges()
     }
 
+    private fun TimeInfo.makeTimeString() = "${toTwoDigits(minute)}:${toTwoDigits(second)}"
+
     val progress = _currentTime.map {
         if (cutOffTimes.size == 4) {
-            val current = it.info.minute * 60 + it.info.second
-            val max = cutOffTimes[3]
+            val current = it.info.tick
+            val max = cutOffTimes[3] * 1000
             (current.toFloat()/max.toFloat() * 1000F).toInt()
         } else {
             0
@@ -63,8 +85,8 @@ class TimerViewModel @Inject constructor(
 
     val animationTranslation = _currentTime.map {
         if (cutOffTimes.size == 4) {
-            val current = it.info.minute * 60 + it.info.second
-            val max = cutOffTimes[3]
+            val current = it.info.tick
+            val max = cutOffTimes[3] * 1000
             animIconMovingSpan * current / max
         } else {
             0
@@ -74,6 +96,7 @@ class TimerViewModel @Inject constructor(
     val timeTextColor =
         _currentTime.map {
             when (it) {
+                is TimerState.Ready -> Color.LTGRAY
                 is TimerState.Expired -> Color.LTGRAY
                 else -> Color.DKGRAY
             }
@@ -108,7 +131,7 @@ class TimerViewModel @Inject constructor(
     private fun calculateEndColor(state: TimerState): Int {
         return when (state) {
             is TimerState.Initialized -> Color.LTGRAY
-            is TimerState.Ready -> Color.LTGRAY
+            is TimerState.Ready -> Color.DKGRAY
             is TimerState.Green -> Color.GREEN
             is TimerState.Yellow -> Color.YELLOW
             is TimerState.Red -> Color.RED
@@ -132,12 +155,19 @@ class TimerViewModel @Inject constructor(
     private fun start() {
         var timeTick = 0
         _currentTime.value = TimerState.ready()
-        timerJob = viewModelScope.launch {
+        timerJob = viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 delay(timeTickUnit.toLong())
                 if (!_currentTime.value.paused) {
-                    timeTick++
+                    timeTick += (timeTickUnit * timeMultiply)
                     _currentTime.value = timeTick.toTimerState(cutOffTimes)
+                    Log.i(TAG,"TimeTick - tick($timeTick), " +
+                            "minute(${_currentTime.value.info.minute}) " +
+                            "second(${_currentTime.value.info.second}) " +
+                            "state(${_currentTime.value} ")
+                }
+                else {
+                    Log.i(TAG,"TimeTick - paused")
                 }
             }
         }
@@ -167,26 +197,56 @@ class TimerViewModel @Inject constructor(
         else pause()
     }
 
+    val recordToastShow = MutableSharedFlow<String>()
+
+    private fun TimeInfo.checkQualified(): Boolean {
+        val elapsed = minute * 60 + second
+        return elapsed >= (cutOffTimes[0] - greenMarginalTime) && elapsed <= cutOffTimes[3]
+    }
+    private fun recordTime() {
+        val time = _currentTime.value.info.makeTimeString()
+        val qualified = _currentTime.value.info.checkQualified()
+
+        sharedState.timeRecords.value =
+            sharedState.timeRecords.value.plus(
+                TimeRecord(role, name, time, qualified)
+            )
+        viewModelScope.launch {
+            val toastString = if (qualified) "$name qualified with a time of $time"
+            else "$name didn't qualify with a time of $time"
+
+            recordToastShow.emit(toastString)
+        }
+    }
     fun stopButtonClick() {
+        recordTime()
         stop()
     }
 
-    fun setRoleAndCutoffs(role: String, cutoffs: String) {
+    fun setRoleAndCutoffs(role: String, name: String, cutoffs: String) {
+        this.role = role
+        this.name = name
+        this.cutoffs = cutoffs
 
         val array = cutoffs.split("-")
-        val margin = if (role == "TableTopic" || (array.size >=2 && array[0].toInt() == 1) ) 15 else 30
+        greenMarginalTime = if (array[0].toInt() <= 1) 15 else 30
+        redMarginalTime = if (array[1].toInt() <= 2) 15 else 30
 
-        if (array.size == 2) {
-            val t1 = array[0].toInt() *60
-            val t2 = array[1].toInt() *60
-            cutOffTimes = arrayListOf(t1 - margin, (t1+t2)/2, t2, t2 + margin)
-        } else if (array.size == 3) {
-            val t1 = array[0].toInt() *60
-            val t2 = array[1].toInt() *60
-            val t3 = array[2].toInt() *60
-            cutOffTimes = arrayListOf(t1- margin, t2, t3, t3 + margin)
-        } else {
-            cutOffTimes = defaultCutOffs
+        cutOffTimes = when (array.size) {
+            2 -> {
+                val t1 = array[0].toInt() * 60
+                val t2 = array[1].toInt() * 60
+                arrayListOf(t1, (t1+t2)/2, t2, t2 + redMarginalTime)
+            }
+            3 -> {
+                val t1 = array[0].toInt() *60
+                val t2 = array[1].toInt() *60
+                val t3 = array[2].toInt() *60
+                arrayListOf(t1, t2, t3, t3 + redMarginalTime)
+            }
+            else -> {
+                defaultCutOffs
+            }
         }
     }
 }

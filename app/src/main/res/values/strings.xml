@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SOTM timer</string>
-    <string name="app_name_timer">SOTM Timer</string>
+    <string name="app_name">Speak Timer</string>
+    <string name="app_name_timer">Speak Timer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Samsung One Toast Master</string>
@@ -8,14 +8,19 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_test_mode">Change to test mode</string>
     <string name="action_normal_mode">Change to normal mode</string>
+    <string name="action_show_record">Show speech time record</string>
 
     <string name="menu_meeting">Meeting</string>
     <string name="menu_roles">Role Guide</string>
-    <string name="menu_timer">SOTM Timer</string>
+    <string name="menu_timer">Speak Timer</string>
     <string name="menu_vote">Vote</string>
     <string name="menu_stats">Statistics</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="green">Green</string>
-
+    <string name="context_menu_delete">Delete</string>
+    <string name="context_menu_edit">Edit</string>
+    <string name="action_sort_by_name">Sort by name</string>
+    <string name="action_sort_by_roles">Sort by roles</string>
+    <string name="action_sort_by_creation">Sort by creation time</string>
 </resources>
