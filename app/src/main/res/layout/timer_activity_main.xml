@@ -9,6 +9,7 @@
             type="com.ykseon.toastmaster.ui.timer.TimerViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/timer_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@{safeUnbox(viewModel.backgroundColor)}"

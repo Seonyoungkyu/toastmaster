@@ -2,10 +2,13 @@ package com.ykseon.toastmaster.ui.timer
 
 import android.graphics.Color
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.common.SharedState
+import com.ykseon.toastmaster.model.SettingsPreferences
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER_DETAIL_INFO
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_START_TIMER_IMMEDIATE
 import com.ykseon.toastmaster.model.TimeRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +30,8 @@ import javax.inject.Inject
 private const val TAG = "TimerViewModel"
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    val sharedState: SharedState
+    private val sharedState: SharedState,
+    private val settingsPreferences: SettingsPreferences
 ): ViewModel() {
 
     private val defaultCutOffs = arrayListOf<Int>(5,10,15,20)
@@ -45,13 +49,22 @@ class TimerViewModel @Inject constructor(
     lateinit var cutoffs: String
 
     var defaultBackgroundColor: Int = Color.LTGRAY
+
+    val showRemainingTime = settingsPreferences.getValue(KEY_SHOW_REMAINING_TIME, false)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val timeText =
         _currentTime
             .distinctUntilChanged {
                     old, new ->
                 old.info.minute == new.info.minute && old.info.second == new.info.second
             }
-            .map{it.info.makeTimeString()}
+            .map {
+                settingsPreferences.getValueImmediate(KEY_SHOW_REMAINING_TIME)
+                if (showRemainingTime.value) cutOffTimes[3] - it.info.minute*60 - it.info.second
+                else  it.info.minute * 60 + it.info.second
+            }
+            .map{it.makeTimeString()}
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
 
     // region color change
@@ -62,7 +75,6 @@ class TimerViewModel @Inject constructor(
 
     var animIconMovingSpan = 0
 
-
     init {
         sharedState.testMode.onEach {
             timeMultiply = if (it) 10 else 1
@@ -71,7 +83,28 @@ class TimerViewModel @Inject constructor(
         observeTimeChanges()
     }
 
+    val detailVisible = settingsPreferences
+        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, true)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+
+    fun setDetailVisible(value: Boolean) {
+        settingsPreferences.saveValue(KEY_SHOW_TIMER_DETAIL_INFO, value)
+    }
+
+    fun toggleTimerRemaining() {
+        settingsPreferences.saveValue(KEY_SHOW_REMAINING_TIME, !showRemainingTime.value)
+    }
+
+    fun tryStart() {
+        viewModelScope.launch {
+            settingsPreferences.getValue(KEY_START_TIMER_IMMEDIATE, true).collect {
+                if(it) startButtonClick()
+            }
+        }
+    }
     private fun TimeInfo.makeTimeString() = "${toTwoDigits(minute)}:${toTwoDigits(second)}"
+    private fun Int.makeTimeString() = "${toTwoDigits(this/60)}:${toTwoDigits(this%60)}"
+
 
     val progress = _currentTime.map {
         if (cutOffTimes.size == 4) {

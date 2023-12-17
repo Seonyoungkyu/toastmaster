@@ -6,7 +6,27 @@
         <item>Table Topic</item>
         <item>Debate</item>
     </string-array>
-    <string-array name="spinnerItems">
+
+    <string-array name="buffer_times">
+        <item>30 seconds, but 15 seconds up tp 2 minutes</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+        <item>40 seconds</item>
+    </string-array>
+
+    <string-array name="green_card_policies">
+        <item>show on time but judge qualification to apply buffer time</item>
+        <item>show on time </item>
+        <item>show earlier by buffer time</item>
+    </string-array>
+
+    <string-array name="sort_type">
+        <item>Sort by name</item>
+        <item>Sort by role</item>
+        <item>Sort by creation time</item>
+    </string-array>
+
+    <string-array name="spinner_items">
         <item>Unspecified</item>
         <item>1 min</item>
         <item>2 min</item>

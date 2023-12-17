@@ -83,7 +83,7 @@
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:entries="@array/spinnerItems"
+                android:entries="@array/spinner_items"
                 android:spinnerMode="dropdown" />
 
         </FrameLayout>
@@ -108,7 +108,7 @@
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:entries="@array/spinnerItems"
+                android:entries="@array/spinner_items"
                 android:spinnerMode="dropdown" />
         </FrameLayout>
         <FrameLayout
@@ -132,7 +132,7 @@
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
-                android:entries="@array/spinnerItems"
+                android:entries="@array/spinner_items"
                 android:spinnerMode="dropdown" />
         </FrameLayout>
     </LinearLayout>

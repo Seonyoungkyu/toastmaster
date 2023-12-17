@@ -8,7 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -19,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.ykseon.toastmaster.common.SharedState
 import com.ykseon.toastmaster.common.SortOption
 import com.ykseon.toastmaster.databinding.ActivityMainBinding
+import com.ykseon.toastmaster.ui.preference.PreferencesActivity
 import com.ykseon.toastmaster.ui.record.RecordActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
-        val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         // Passing each menu ID as a set of Ids because each
@@ -69,7 +68,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.action_show_record ) {
+        if (item.itemId == R.id.action_settings) {
+            ContextCompat.startActivity(
+                this,
+                Intent(this, PreferencesActivity::class.java),
+                null
+            )
+        }
+        else if(item.itemId == R.id.action_show_record ) {
             ContextCompat.startActivity(
                 this,
                 Intent(this, RecordActivity::class.java),
@@ -86,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         else if (item.itemId == R.id.action_sort_name) {
-            sharedState.sortOption.value = SortOption.ALPHABETICAL
+            sharedState.sortOption.value = SortOption.NAME
         }
         else if (item.itemId == R.id.action_sort_role) {
             sharedState.sortOption.value = SortOption.ROLE

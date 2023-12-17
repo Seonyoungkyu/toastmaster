@@ -43,7 +43,9 @@ class TimerActivity : AppCompatActivity() {
         val cutoffs = checkNotNull(intent.getStringExtra("cutoffs"))
 
         timerViewModel.setRoleAndCutoffs(role, name, cutoffs)
-        if(savedInstanceState == null) timerViewModel.startButtonClick()
+        if(savedInstanceState == null) {
+            timerViewModel.tryStart()
+        }
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -51,16 +53,29 @@ class TimerActivity : AppCompatActivity() {
             timerViewModel.animIconMovingSpan = binding.root.width
         }
 
+        binding.timerMain.setOnClickListener {
+            timerViewModel.setDetailVisible(binding.headerInfo.visibility != View.VISIBLE)
+        }
+
+        binding.headerInfo.setOnClickListener {
+            timerViewModel.setDetailVisible(binding.headerInfo.visibility != View.VISIBLE)
+        }
+
+
         binding.timeText.setOnClickListener {
-            val visible = binding.headerInfo.visibility == View.VISIBLE
+            timerViewModel.toggleTimerRemaining()
+        }
+
+        timerViewModel.detailVisible.onEach { visible ->
             binding.headerInfo.animate()
-                .alpha(if (visible) 0f else 1f)
+                .alpha(if (!visible) 0f else 1f)
                 .setDuration(300)
                 .withEndAction {
-                    binding.headerInfo.visibility = if (visible) View.INVISIBLE else View.VISIBLE
+                    binding.headerInfo.visibility = if (visible) View.VISIBLE else View.INVISIBLE
                 }
                 .start()
-        }
+        }.launchIn(lifecycleScope)
+
         moveAnimationIcon()
         showRecordToast()
     }

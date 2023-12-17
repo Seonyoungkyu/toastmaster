@@ -22,6 +22,8 @@ import com.ykseon.toastmaster.common.TABLE_TOPIC_ROLE
 import com.ykseon.toastmaster.data.Timer
 import com.ykseon.toastmaster.data.TimerDAO
 import com.ykseon.toastmaster.data.TimerDatabase
+import com.ykseon.toastmaster.model.SettingsPreferences
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SORT_TYPE
 import com.ykseon.toastmaster.ui.theme.PastelBlue1
 import com.ykseon.toastmaster.ui.theme.PastelBlue2
 import com.ykseon.toastmaster.ui.theme.PastelDarkBlue1
@@ -36,17 +38,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "TimerFragmentViewModel"
 @HiltViewModel
 class TimerFragmentViewModel @Inject constructor(
-    val sharedState: SharedState
+    private val sharedState: SharedState,
+    private val settingsPreferences: SettingsPreferences
 ) : ViewModel() {
     fun startTimer(context: Context, role:String, name: String, cutoffs: String) {
         startActivity(
@@ -67,12 +72,17 @@ class TimerFragmentViewModel @Inject constructor(
     var fragmentManager: FragmentManager? = null
     private var database: TimerDatabase? = null
 
+    private val sortOption =
+        settingsPreferences.getValue(KEY_SORT_TYPE, 0)
+            .stateIn(viewModelScope, SharingStarted.Lazily, 0)
+
     init {
-        sharedState.sortOption.onEach {
+        sortOption.onEach {
             database?.timerDAO()?.load()
-        }.flowOn(Dispatchers.IO)
-            .launchIn(viewModelScope)
+        }.flowOn(Dispatchers.IO).launchIn(viewModelScope)
     }
+
+
     private suspend fun initDatabase(context: Context) {
         database = Room.databaseBuilder(
             context, TimerDatabase::class.java, "timer_database")
@@ -120,9 +130,9 @@ class TimerFragmentViewModel @Inject constructor(
 
     private suspend fun TimerDAO.load() {
         val list = mutableListOf<TimerRecordItem>()
-        val sortedLit = when(sharedState.sortOption.value) {
-            SortOption.ROLE -> getAllTimers().sortedBy { it.role.toRoleOrder() }
-            SortOption.ALPHABETICAL-> getAllTimers().sortedBy { it.name }
+        val sortedLit = when(sortOption.value) {
+            SortOption.ROLE.value -> getAllTimers().sortedBy { it.role.toRoleOrder() }
+            SortOption.NAME.value-> getAllTimers().sortedBy { it.name }
             else -> getAllTimers().sortedBy { it.id }
         }
 

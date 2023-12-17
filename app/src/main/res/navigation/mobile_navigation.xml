@@ -5,11 +5,11 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/nav_timer">
 
-    <fragment
-        android:id="@+id/nav_meeting"
-        android:name="com.ykseon.toastmaster.ui.meeting.MeetingFragment"
-        android:label="@string/menu_meeting"
-        tools:layout="@layout/fragment_meeting" />
+<!--    <fragment-->
+<!--        android:id="@+id/nav_meeting"-->
+<!--        android:name="com.ykseon.toastmaster.ui.meeting.MeetingFragment"-->
+<!--        android:label="@string/menu_meeting"-->
+<!--        tools:layout="@layout/fragment_meeting" />-->
 
     <fragment
         android:id="@+id/nav_timer"
@@ -17,15 +17,15 @@
         android:label="@string/menu_timer"
         tools:layout="@layout/fragment_timer" />
 
-    <fragment
-        android:id="@+id/nav_vote"
-        android:name="com.ykseon.toastmaster.ui.vote.VoteFragment"
-        android:label="@string/menu_vote"
-        tools:layout="@layout/fragment_vote" />
+<!--    <fragment-->
+<!--        android:id="@+id/nav_vote"-->
+<!--        android:name="com.ykseon.toastmaster.ui.vote.VoteFragment"-->
+<!--        android:label="@string/menu_vote"-->
+<!--        tools:layout="@layout/fragment_vote" />-->
 
-    <fragment
-        android:id="@+id/nav_roles"
-        android:name="com.ykseon.toastmaster.ui.roles.RolesFragment"
-        android:label="@string/menu_roles"
-        tools:layout="@layout/fragment_roles" />
+<!--    <fragment-->
+<!--        android:id="@+id/nav_roles"-->
+<!--        android:name="com.ykseon.toastmaster.ui.roles.RolesFragment"-->
+<!--        android:label="@string/menu_roles"-->
+<!--        tools:layout="@layout/fragment_roles" />-->
 </navigation>

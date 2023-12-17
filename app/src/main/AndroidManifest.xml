@@ -37,6 +37,12 @@
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
             >
         </activity>
+        <activity
+            android:name=".ui.preference.PreferencesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ToastMaster.NoActionBar"
+            >
+        </activity>
     </application>
 
 </manifest>
