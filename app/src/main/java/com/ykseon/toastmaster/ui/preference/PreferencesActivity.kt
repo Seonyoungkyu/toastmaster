@@ -89,6 +89,8 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val showRemainingTime = viewModel.showRemainingTime.collectAsState()
     val acceleration = viewModel.acceleration.collectAsState()
     val startTimerImmediate = viewModel.startTimerImmediate.collectAsState()
+    val bufferTime = viewModel.bufferTime.collectAsState()
+    val greenCardPolicy = viewModel.greenCardPolicy.collectAsState()
 
     Scaffold(
         topBar = {
@@ -139,13 +141,14 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                     title = "Buffer Time",
                     items = bufferTimes,
                     onItemSelected = { viewModel.setBufferTime(bufferTimes.indexOf(it)) },
-                    selectedString = bufferTimes[viewModel.bufferTime.collectAsState().value]
+                    selectedString = bufferTimes[bufferTime.value]
                 )
+
                 DropdownPreference(
                     title = "Green Card Policy",
                     items = greenCardPolicies,
                     onItemSelected = { viewModel.setGreenCardPolicy(greenCardPolicies.indexOf(it)) },
-                    selectedString = greenCardPolicies[viewModel.greenCardPolicy.collectAsState().value]
+                    selectedString = greenCardPolicies[greenCardPolicy.value]
                 )
             }
 

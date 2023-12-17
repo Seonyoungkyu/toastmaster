@@ -29,15 +29,18 @@ sealed class TimerState {
     }
 }
 
-fun Int.toTimerState(cutoffs: List<Int>): TimerState {
-    val totalSecond = this / 1000
-    val minute = totalSecond / 60
-    val second = totalSecond % 60
+fun Int.toTimerState(cutoffs: List<Int>, reversed: Boolean): TimerState {
+    val elapsed = this / 1000
+    val remained = cutoffs[3] - elapsed
+
+    val presenting = if (reversed) remained else elapsed
+    val minute = presenting / 60
+    val second = presenting % 60
     val timeInfo = TimeInfo(minute, second, this)
     return if (this == 0) TimerState.Initialized(timeInfo)
-        else if (totalSecond < cutoffs[0]) TimerState.Ready(timeInfo)
-        else if (totalSecond < cutoffs[1]) TimerState.Green(timeInfo)
-        else if (totalSecond < cutoffs[2]) TimerState.Yellow(timeInfo)
-        else if (totalSecond < cutoffs[3]) TimerState.Red(timeInfo)
+        else if (elapsed < cutoffs[0]) TimerState.Ready(timeInfo)
+        else if (elapsed < cutoffs[1]) TimerState.Green(timeInfo)
+        else if (elapsed < cutoffs[2]) TimerState.Yellow(timeInfo)
+        else if (elapsed < cutoffs[3]) TimerState.Red(timeInfo)
         else TimerState.Expired(timeInfo)
 }

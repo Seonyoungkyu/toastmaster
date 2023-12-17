@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.common.SharedState
 import com.ykseon.toastmaster.model.SettingsPreferences
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_GREEN_CARD_POLICY
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER_DETAIL_INFO
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_START_TIMER_IMMEDIATE
@@ -17,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -38,7 +42,12 @@ class TimerViewModel @Inject constructor(
     private var cutOffTimes = defaultCutOffs
     private var timeTickUnit = 50
     private var timeMultiply = 1
-    private val initState = 0.toTimerState(cutOffTimes)
+
+    private val showRemainingTime = settingsPreferences.getValue(KEY_SHOW_REMAINING_TIME, false)
+        .stateIn(viewModelScope, Eagerly, false)
+    private val initState
+        get() = 0.toTimerState(cutOffTimes, showRemainingTime.value)
+
     private val _currentTime = MutableStateFlow<TimerState>(initState)
     val currentTime = _currentTime.asStateFlow()
     private var greenMarginalTime = 0
@@ -50,21 +59,12 @@ class TimerViewModel @Inject constructor(
 
     var defaultBackgroundColor: Int = Color.LTGRAY
 
-    val showRemainingTime = settingsPreferences.getValue(KEY_SHOW_REMAINING_TIME, false)
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
     val timeText =
         _currentTime
             .distinctUntilChanged {
-                    old, new ->
-                old.info.minute == new.info.minute && old.info.second == new.info.second
+                old, new -> old.info.minute == new.info.minute && old.info.second == new.info.second
             }
-            .map {
-                settingsPreferences.getValueImmediate(KEY_SHOW_REMAINING_TIME)
-                if (showRemainingTime.value) cutOffTimes[3] - it.info.minute*60 - it.info.second
-                else  it.info.minute * 60 + it.info.second
-            }
-            .map{it.makeTimeString()}
+            .map{it.info.makeTimeString()}
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
 
     // region color change
@@ -75,17 +75,28 @@ class TimerViewModel @Inject constructor(
 
     var animIconMovingSpan = 0
 
+    private val bufferTime = settingsPreferences.getValue(KEY_BUFFER_TIME, 0)
+        .stateIn(viewModelScope, Eagerly, 0)
+
+    private val greenCardPolicy = settingsPreferences.getValue(KEY_GREEN_CARD_POLICY, 0)
+        .stateIn(viewModelScope, Eagerly, 0)
+
     init {
-        sharedState.testMode.onEach {
+        settingsPreferences.getValue(KEY_ACCELERATION, false).onEach {
             timeMultiply = if (it) 10 else 1
+        }.launchIn(viewModelScope)
+
+        showRemainingTime.onEach {
+            _currentTime.value =
+                _currentTime.value.info.tick.toTimerState(cutOffTimes, it)
         }.launchIn(viewModelScope)
 
         observeTimeChanges()
     }
 
     val detailVisible = settingsPreferences
-        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, true)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, false)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     fun setDetailVisible(value: Boolean) {
         settingsPreferences.saveValue(KEY_SHOW_TIMER_DETAIL_INFO, value)
@@ -97,8 +108,8 @@ class TimerViewModel @Inject constructor(
 
     fun tryStart() {
         viewModelScope.launch {
-            settingsPreferences.getValue(KEY_START_TIMER_IMMEDIATE, true).collect {
-                if(it) startButtonClick()
+            settingsPreferences.getValueImmediate(KEY_START_TIMER_IMMEDIATE).let {
+                if (it == null || it) startButtonClick()
             }
         }
     }
@@ -193,11 +204,7 @@ class TimerViewModel @Inject constructor(
                 delay(timeTickUnit.toLong())
                 if (!_currentTime.value.paused) {
                     timeTick += (timeTickUnit * timeMultiply)
-                    _currentTime.value = timeTick.toTimerState(cutOffTimes)
-                    Log.i(TAG,"TimeTick - tick($timeTick), " +
-                            "minute(${_currentTime.value.info.minute}) " +
-                            "second(${_currentTime.value.info.second}) " +
-                            "state(${_currentTime.value} ")
+                    _currentTime.value = timeTick.toTimerState(cutOffTimes, showRemainingTime.value)
                 }
                 else {
                     Log.i(TAG,"TimeTick - paused")
@@ -233,8 +240,13 @@ class TimerViewModel @Inject constructor(
     val recordToastShow = MutableSharedFlow<String>()
 
     private fun TimeInfo.checkQualified(): Boolean {
-        val elapsed = minute * 60 + second
-        return elapsed >= (cutOffTimes[0] - greenMarginalTime) && elapsed <= cutOffTimes[3]
+        val elapsed = tick / 1000
+
+        return if (greenCardPolicy.value == 0) {
+            elapsed >= (cutOffTimes[0] - greenMarginalTime) && elapsed <= cutOffTimes[3]
+        } else {
+            elapsed >= (cutOffTimes[0]) && elapsed <= cutOffTimes[3]
+        }
     }
     private fun recordTime() {
         val time = _currentTime.value.info.makeTimeString()
@@ -262,20 +274,30 @@ class TimerViewModel @Inject constructor(
         this.cutoffs = cutoffs
 
         val array = cutoffs.split("-")
-        greenMarginalTime = if (array[0].toInt() <= 1) 15 else 30
-        redMarginalTime = if (array[1].toInt() <= 2) 15 else 30
+        val endTime = array.last().toInt()
+        val bufferTime = when(bufferTime.value) {
+            0 -> if (endTime <= 2) 15 else 30
+            1 -> 15
+            2 -> 30
+            3 -> 40
+            else -> { 0 }
+        }
+        greenMarginalTime = bufferTime
+        redMarginalTime = bufferTime
+
+        val greenCardMargin = if (greenCardPolicy.value == 2) bufferTime else 0
 
         cutOffTimes = when (array.size) {
             2 -> {
                 val t1 = array[0].toInt() * 60
                 val t2 = array[1].toInt() * 60
-                arrayListOf(t1, (t1+t2)/2, t2, t2 + redMarginalTime)
+                arrayListOf(t1 - greenCardMargin , (t1+t2)/2, t2, t2 + bufferTime)
             }
             3 -> {
                 val t1 = array[0].toInt() *60
                 val t2 = array[1].toInt() *60
                 val t3 = array[2].toInt() *60
-                arrayListOf(t1, t2, t3, t3 + redMarginalTime)
+                arrayListOf(t1 - greenCardMargin, t2, t3, t3 + bufferTime)
             }
             else -> {
                 defaultCutOffs

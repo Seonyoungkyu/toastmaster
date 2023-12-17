@@ -32,15 +32,8 @@ class SettingsPreferences @Inject constructor(
         }
     }
 
-    suspend fun <T> getValueImmediate(key: Preferences.Key<T>): T? {
-        val dataStoreValue = context.dataStore.data.first()
-        val value = dataStoreValue[key]
-
-        // Optional: Log the snapshot to help with debugging
-        Log.i(TAG, "DataStore snapshot: $dataStoreValue")
-
-        return value
-    }
+    suspend fun <T> getValueImmediate(key: Preferences.Key<T>): T? =
+        context.dataStore.data.first()[key]
 
     fun <T> saveValue(key: Preferences.Key<T>, value: T) {
         scope.launch {
@@ -54,8 +47,8 @@ class SettingsPreferences @Inject constructor(
 
         val KEY_SHOW_TIMER_DETAIL_INFO = booleanPreferencesKey("show_timer_detail_info")
         val KEY_START_TIMER_IMMEDIATE = booleanPreferencesKey("start_timer_immediate")
-        val KEY_BUFFER_TIME = intPreferencesKey("buffer_time_policy")
-        val KEY_GREEN_CARD_POLICY = intPreferencesKey("buffer_time_policy")
+        val KEY_BUFFER_TIME = intPreferencesKey("buffer_time")
+        val KEY_GREEN_CARD_POLICY = intPreferencesKey("green_card_policy")
         val KEY_SORT_TYPE = intPreferencesKey("sort_type")
         val KEY_ACCELERATION = booleanPreferencesKey("acceleration")
         val KEY_SHOW_REMAINING_TIME = booleanPreferencesKey("show_remaining_time")
