@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.common.DEBATE_ROLE
 import com.ykseon.toastmaster.common.EVALUATOR_ROLE
 import com.ykseon.toastmaster.common.SPEAKER_ROLE
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -217,9 +219,16 @@ class TimerViewModel @Inject constructor(
         }
     }
 
+    private val _closeTimer = MutableSharedFlow<Unit>()
+    val closeTimer = _closeTimer.asSharedFlow()
+
     private fun stop() {
         timerJob?.cancel()
         _currentTime.value = initState
+
+        viewModelScope.launch {
+            _closeTimer.emit(Unit)
+        }
     }
 
     private fun pause() {
@@ -279,8 +288,21 @@ class TimerViewModel @Inject constructor(
             recordToastShow.emit(toastString)
         }
     }
+
+    private val _showNameInputDialog = MutableSharedFlow<Unit>()
+    val showNameInputDialog = _showNameInputDialog.asSharedFlow()
+
     fun stopButtonClick() {
-        recordTime()
+        pause()
+        if(name == ANONYMOUS) {
+            viewModelScope.launch {
+                _showNameInputDialog.emit(Unit)
+            }
+            return
+        }
+        else {
+            recordTime()
+        }
         stop()
     }
 

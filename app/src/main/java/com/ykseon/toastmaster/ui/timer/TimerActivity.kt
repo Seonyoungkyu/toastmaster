@@ -14,7 +14,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
+import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.databinding.TimerActivityMainBinding
+import com.ykseon.toastmaster.ui.nameinput.NameInputDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -76,6 +78,17 @@ class TimerActivity : AppCompatActivity() {
                 .start()
         }.launchIn(lifecycleScope)
 
+        timerViewModel.showNameInputDialog.onEach{
+            NameInputDialog(this).show {
+                timerViewModel.name = it
+                timerViewModel.stopButtonClick()
+                timerViewModel.name = ANONYMOUS
+            }
+        }.launchIn(lifecycleScope)
+
+        timerViewModel.closeTimer.onEach {
+            finish()
+        }.launchIn(lifecycleScope)
         moveAnimationIcon()
         showRecordToast()
     }

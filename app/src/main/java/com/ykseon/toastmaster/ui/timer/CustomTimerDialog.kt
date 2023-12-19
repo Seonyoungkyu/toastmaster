@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.getSystemService
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.DialogFragment
+import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.common.DEBATE_ROLE
 import com.ykseon.toastmaster.common.EVALUATOR_ROLE
 import com.ykseon.toastmaster.common.SPEAKER_ROLE
@@ -190,7 +191,7 @@ class CustomTimerDialog(
         return view
     }
 
-    private fun Editable.generateName() = if (this.toString() == "") "Anonymous" else this.toString()
+    private fun Editable.generateName() = if (this.toString() == "") ANONYMOUS else this.toString()
 
     override fun onDestroyView() {
         super.onDestroyView()
