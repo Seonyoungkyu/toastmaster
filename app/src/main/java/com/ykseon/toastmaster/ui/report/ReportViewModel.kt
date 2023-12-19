@@ -1,4 +1,4 @@
-package com.ykseon.toastmaster.ui.record
+package com.ykseon.toastmaster.ui.report
 
 import androidx.lifecycle.ViewModel
 import com.ykseon.toastmaster.common.SharedState
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class RecordViewModel @Inject constructor(
+class ReportViewModel @Inject constructor(
     private val sharedState: SharedState
 ): ViewModel() {
 

@@ -2,36 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_show_record"
+        android:orderInCategory="100"
+        android:title="@string/action_show_report"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_show_record"
-        android:orderInCategory="100"
-        android:title="@string/action_show_record"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_test_mode"
-        android:orderInCategory="100"
-        android:title="@string/action_test_mode"
-        app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_sort_name"
-        android:orderInCategory="100"
-        android:title="@string/action_sort_by_name"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_sort_role"
-        android:orderInCategory="100"
-        android:title="@string/action_sort_by_roles"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_sort_creation"
-        android:orderInCategory="100"
-        android:title="@string/action_sort_by_creation"
-        app:showAsAction="never" />
 </menu>

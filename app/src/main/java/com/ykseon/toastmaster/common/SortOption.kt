@@ -2,6 +2,6 @@ package com.ykseon.toastmaster.common
 
 enum class SortOption(val value: Int) {
     NAME(0),
-    CREATION(1),
-    ROLE(2),
+    ROLE(1),
+    CREATION(2),
 }

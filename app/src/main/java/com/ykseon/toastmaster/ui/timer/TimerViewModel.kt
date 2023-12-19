@@ -4,7 +4,11 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ykseon.toastmaster.common.DEBATE_ROLE
+import com.ykseon.toastmaster.common.EVALUATOR_ROLE
+import com.ykseon.toastmaster.common.SPEAKER_ROLE
 import com.ykseon.toastmaster.common.SharedState
+import com.ykseon.toastmaster.common.TABLE_TOPIC_ROLE
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
@@ -248,13 +252,25 @@ class TimerViewModel @Inject constructor(
             elapsed >= (cutOffTimes[0]) && elapsed <= cutOffTimes[3]
         }
     }
+
+    private fun makeRoleAndCutoffString(): String {
+        val prefix = when (role) {
+            SPEAKER_ROLE -> "S"
+            TABLE_TOPIC_ROLE -> "T"
+            EVALUATOR_ROLE -> "E"
+            DEBATE_ROLE ->"D"
+            else -> " "
+        }
+        return "$prefix $cutoffs"
+    }
+
     private fun recordTime() {
         val time = _currentTime.value.info.makeTimeString()
         val qualified = _currentTime.value.info.checkQualified()
 
         sharedState.timeRecords.value =
             sharedState.timeRecords.value.plus(
-                TimeRecord(role, name, time, qualified)
+                TimeRecord( makeRoleAndCutoffString(), name, time, qualified)
             )
         viewModelScope.launch {
             val toastString = if (qualified) "$name qualified with a time of $time"

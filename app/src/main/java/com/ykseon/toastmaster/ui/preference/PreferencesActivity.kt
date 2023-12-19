@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ykseon.toastmaster.R
+import com.ykseon.toastmaster.common.compose.Header
 import com.ykseon.toastmaster.ui.theme.PastelBlue1
 import com.ykseon.toastmaster.ui.theme.PastelBlue3
 import com.ykseon.toastmaster.ui.theme.PastelDarkBlue3
@@ -91,10 +92,11 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val startTimerImmediate = viewModel.startTimerImmediate.collectAsState()
     val bufferTime = viewModel.bufferTime.collectAsState()
     val greenCardPolicy = viewModel.greenCardPolicy.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
-            Header("Settings")
+            Header("Settings") { (context as? PreferencesActivity)?.finish() }
         }
 
     ) {
@@ -132,20 +134,20 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
 
             PreferenceSection("Timer actions") {
                 SwitchPreference(
-                    title = "Start Timer Immediately",
+                    title = "Start timer immediately",
                     checked = startTimerImmediate.value,
                     onCheckedChange = { viewModel.setStartTimerImmediate(it) }
                 )
 
                 DropdownPreference(
-                    title = "Buffer Time",
+                    title = "Buffer time",
                     items = bufferTimes,
                     onItemSelected = { viewModel.setBufferTime(bufferTimes.indexOf(it)) },
                     selectedString = bufferTimes[bufferTime.value]
                 )
 
                 DropdownPreference(
-                    title = "Green Card Policy",
+                    title = "Green card policy",
                     items = greenCardPolicies,
                     onItemSelected = { viewModel.setGreenCardPolicy(greenCardPolicies.indexOf(it)) },
                     selectedString = greenCardPolicies[greenCardPolicy.value]
@@ -195,37 +197,6 @@ fun SwitchPreference(
             },
             colors = switchColors
         )
-    }
-}
-
-@Composable
-fun Header(title: String) {
-    val context = LocalContext.current
-
-    Box( modifier = Modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colors.primary)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .background(MaterialTheme.colors.primary),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onPrimary
-            )
-            IconButton(onClick = {
-                (context as? PreferencesActivity)?.finish()
-            }) {
-                Icon(Icons.Default.Close, "close", tint = MaterialTheme.colors.onPrimary)
-            }
-        }
     }
 }
 
@@ -294,10 +265,20 @@ fun DropdownPreference(
                             expanded = false
                         }
                     ) {
-                        Text(text = item,
+                        Text(
+                            text = item,
                             color = MaterialTheme.colors.onSurface
-                            )
+                        )
                     }
+                    if (index != items.lastIndex) {
+                        Divider(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .padding(start = 16.dp, end = 16.dp),
+                            color = Color.Gray
+                        )
+                    }
+
                 }
             }
         }

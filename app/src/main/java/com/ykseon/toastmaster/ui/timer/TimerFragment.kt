@@ -54,18 +54,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.common.CREATION_SYSTEM_ROLE
 import com.ykseon.toastmaster.ui.contextmenu.ContextMenuItem
 import com.ykseon.toastmaster.ui.contextmenu.ContextMenuPopup
 import com.ykseon.toastmaster.ui.theme.TimerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 private const val TAG = "TimerFragment"
 @AndroidEntryPoint
 class TimerFragment : Fragment() {
 
     private val timerFragmentViewModel by viewModels<TimerFragmentViewModel>()
+    private var dialog: CustomTimerDialog? = null
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,8 +91,25 @@ class TimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timerFragmentViewModel.fragmentManager = activity?.supportFragmentManager
         timerFragmentViewModel.loadTimer(view.context)
+
+        timerFragmentViewModel.showCustomTimerDialog.onEach { info ->
+            activity?.let {activity ->
+                dialog = CustomTimerDialog(object : CustomTimerDialogCallback {
+                    override fun onYesButtonClick(item: TimerItem) {
+                        if (info == null) {
+                            timerFragmentViewModel.createItem(item)
+                        }else {
+                            timerFragmentViewModel.updateItemAndReload(info.id , item)
+                        }
+
+                    }
+                })
+
+                info?.let { dialog?.initialTimerItem = it.timerItem }
+                dialog?.show(activity.supportFragmentManager, "Timer Input Dialog")
+            }
+        }.launchIn(lifecycleScope)
     }
 
     override fun onDestroyView() {

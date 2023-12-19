@@ -8,7 +8,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_test_mode">Change to test mode</string>
     <string name="action_normal_mode">Change to normal mode</string>
-    <string name="action_show_record">Show speech time record</string>
+    <string name="action_show_report">Timer\'s report</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_meeting">Meeting</string>

@@ -39,7 +39,10 @@ class CustomTimerDialog(
     init {
         this.confirmDialogInterface = confirmDialogInterface
     }
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
     private fun Spinner.selectString(value: String): Boolean {
         for(i in 0 until adapter.count) {
             if (value == adapter.getItem(i))    {

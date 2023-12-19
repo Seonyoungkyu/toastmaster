@@ -37,8 +37,10 @@ import com.ykseon.toastmaster.ui.theme.lightColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -69,7 +71,6 @@ class TimerFragmentViewModel @Inject constructor(
     val timerList = _timerList.asStateFlow()
 
     private var creationJob: Job? = null
-    var fragmentManager: FragmentManager? = null
     private var database: TimerDatabase? = null
 
     private val sortOption =
@@ -158,16 +159,18 @@ class TimerFragmentViewModel @Inject constructor(
 
     fun editTimer(id: Long) {
         val recordItem = _timerList.value.firstOrNull { it.id == id}
-        val dialog = CustomTimerDialog(object: CustomTimerDialogCallback {
-            override fun onYesButtonClick(item: TimerItem) {
-                updateItem(id, item)
-                viewModelScope.launch(Dispatchers.Default) {
-                    database?.timerDAO()?.load()
-                }
+        viewModelScope.launch {
+            recordItem?.let {
+                _showCustomTimerDialog.emit(TimerItemUpdateInfo(id, it.item))
             }
-        })
-        dialog.initialTimerItem = recordItem?.item
-        dialog.show(fragmentManager!!, "Timer Input Dialog")
+        }
+    }
+
+    fun updateItemAndReload(id: Long, item: TimerItem) {
+        updateItem(id, item)
+        viewModelScope.launch(Dispatchers.Default) {
+            database?.timerDAO()?.load()
+        }
     }
 
 
@@ -212,13 +215,13 @@ class TimerFragmentViewModel @Inject constructor(
         }
     }
 
+    private val _showCustomTimerDialog = MutableSharedFlow<TimerItemUpdateInfo?>()
+    val showCustomTimerDialog = _showCustomTimerDialog.asSharedFlow()
+
     fun createTimer() {
-        val dialog = CustomTimerDialog(object: CustomTimerDialogCallback {
-            override fun onYesButtonClick(item: TimerItem) {
-                createItem(item)
-            }
-        })
-        dialog.show(fragmentManager!!, "Timer Input Dialog")
+        viewModelScope.launch {
+            _showCustomTimerDialog.emit(null)
+        }
     }
 
     fun getIconId(recordItem: TimerRecordItem): Int =
@@ -229,5 +232,7 @@ class TimerFragmentViewModel @Inject constructor(
             TABLE_TOPIC_ROLE -> R.drawable.ic_table_topic_foreground
             else -> R.drawable.ic_speaker_foreground
         }
+
+    data class TimerItemUpdateInfo (val id: Long, val timerItem: TimerItem)
 }
 
