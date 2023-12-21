@@ -103,7 +103,12 @@ class TimerFragment : Fragment() {
                         if (info == null) {
                             timerFragmentViewModel.createItem(item)
                         }else {
-                            timerFragmentViewModel.updateItemAndReload(info.id , item)
+                            if (info.duplicate) {
+                                timerFragmentViewModel.createItem(item)
+                            }
+                            else {
+                                timerFragmentViewModel.updateItemAndReload(info.id, item)
+                            }
                         }
 
                     }
@@ -212,6 +217,13 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                                 ) { popup, obj ->
                                     val id = (obj as Long)
                                     viewModel.editTimer(id)
+                                    popup.dismiss()
+                                },
+                                ContextMenuItem(
+                                    context.resources.getString(R.string.context_menu_duplicate),
+                                ) { popup, obj ->
+                                    val id = (obj as Long)
+                                    viewModel.editTimer(id, true)
                                     popup.dismiss()
                                 }
                             ),

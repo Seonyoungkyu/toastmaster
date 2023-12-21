@@ -9,7 +9,7 @@
     <color name="teal_900">#FF216766</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="translucent_gray">#DD444444</color>
+    <color name="translucent_gray">#EE444444</color>
     <color name="gray">#FF666666</color>
     <color name="progress_color">#FF3355EE</color>
 </resources>

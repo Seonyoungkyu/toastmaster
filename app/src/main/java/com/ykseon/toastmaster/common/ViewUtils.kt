@@ -9,13 +9,13 @@ fun AlertDialog.setButtonColor(): AlertDialog {
     val mode = context.resources.configuration.uiMode
 
     if (mode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) {
-        getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.WHITE)
+        getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.YELLOW)
     } else {
         getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
     }
 
     if (mode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES) {
-        getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.WHITE)
+        getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.YELLOW)
     } else {
         getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
     }

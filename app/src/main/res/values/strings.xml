@@ -21,6 +21,7 @@
     <string name="green">Green</string>
     <string name="context_menu_delete">Delete</string>
     <string name="context_menu_edit">Edit</string>
+    <string name="context_menu_duplicate">Duplicate</string>
     <string name="action_sort_by_name">Sort by name</string>
     <string name="action_sort_by_roles">Sort by roles</string>
     <string name="action_sort_by_creation">Sort by creation time</string>

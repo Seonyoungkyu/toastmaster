@@ -157,11 +157,11 @@ class TimerFragmentViewModel @Inject constructor(
         }
     }
 
-    fun editTimer(id: Long) {
+    fun editTimer(id: Long, duplicate: Boolean = false) {
         val recordItem = _timerList.value.firstOrNull { it.id == id}
         viewModelScope.launch {
             recordItem?.let {
-                _showCustomTimerDialog.emit(TimerItemUpdateInfo(id, it.item))
+                _showCustomTimerDialog.emit(TimerItemUpdateInfo(id, it.item, duplicate))
             }
         }
     }
@@ -238,6 +238,6 @@ class TimerFragmentViewModel @Inject constructor(
             else -> R.drawable.ic_speaker_foreground
         }
 
-    data class TimerItemUpdateInfo (val id: Long, val timerItem: TimerItem)
+    data class TimerItemUpdateInfo (val id: Long, val timerItem: TimerItem, val duplicate: Boolean)
 }
 
