@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
@@ -127,6 +130,7 @@ fun TimerGridView(viewModel: TimerFragmentViewModel) {
         columns = GridCells.Adaptive(100.dp),
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(8.dp)
+
     ) {
         items(timerItems.value) { recordItem ->
             Log.i(TAG,"TimerList - addView ($recordItem.id)")
@@ -159,7 +163,7 @@ fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
             style = TextStyle(
                 fontWeight = FontWeight.Normal,
                 fontSize = 45.sp,
-                color = MaterialTheme.colors.onSurface
+                color = Color.LightGray // MaterialTheme.colors.onSurface
             ),
         )
     }
@@ -229,11 +233,23 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
         Box(
             modifier = Modifier.wrapContentSize(align = Alignment.TopStart)
         ) {
-            Icon(
-                modifier = Modifier.requiredSize(30.dp),
-                painter = painterResource(id = viewModel.getIconId(recordItem)),
-                contentDescription = "speaker icon",
-            )
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    modifier = Modifier.requiredSize(30.dp),
+                    painter = painterResource(id = viewModel.getIconId(recordItem)),
+                    contentDescription = "speaker icon",
+                    tint = Color.White
+                )
+                Text(
+                    text = record.item.role,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 10.sp,
+                        color = Color.White // MaterialTheme.colors.onSurface
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         Column(
@@ -248,7 +264,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = MaterialTheme.typography.body1.fontSize,
-                    color = MaterialTheme.colors.onSurface
+                    color = Color.White // MaterialTheme.colors.onSurface
                 ),
                 overflow = TextOverflow.Ellipsis
             )
@@ -258,7 +274,7 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = MaterialTheme.typography.body2.fontSize,
-                    color = MaterialTheme.colors.onSurface
+                    color = Color.White // MaterialTheme.colors.onSurface
                 )
             )
         }

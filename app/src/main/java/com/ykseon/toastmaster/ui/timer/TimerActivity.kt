@@ -1,5 +1,6 @@
 package com.ykseon.toastmaster.ui.timer
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
@@ -9,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat.getInsetsController
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
@@ -17,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.databinding.TimerActivityMainBinding
 import com.ykseon.toastmaster.ui.nameinput.NameInputDialog
+import com.ykseon.toastmaster.ui.report.ReportActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -82,12 +85,18 @@ class TimerActivity : AppCompatActivity() {
             NameInputDialog(this).show {
                 timerViewModel.name = it
                 timerViewModel.stopButtonClick()
-                timerViewModel.name = ANONYMOUS
             }
         }.launchIn(lifecycleScope)
 
         timerViewModel.closeTimer.onEach {
             finish()
+
+            ContextCompat.startActivity(
+                this,
+                Intent(this, ReportActivity::class.java),
+                null
+            )
+
         }.launchIn(lifecycleScope)
         moveAnimationIcon()
         showRecordToast()

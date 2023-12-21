@@ -15,23 +15,39 @@
         android:background="@{safeUnbox(viewModel.backgroundColor)}"
         tools:context=".ui.timer.TimerFragment">
 
-
-        <TextView
-            android:id="@+id/time_text"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/timer_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textAlignment="center"
-            android:textSize="60sp"
-            android:text="@{viewModel.timeText}"
-            android:textColor="@{safeUnbox(viewModel.timeTextColor)}"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:id="@+id/remaining_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:text="@{viewModel.remainingText}"
+                android:textColor="@{safeUnbox(viewModel.timeTextColor)}"
+                />
+            <TextView
+                android:id="@+id/time_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="60sp"
+                android:text="@{viewModel.timeText}"
+                android:textColor="@{safeUnbox(viewModel.timeTextColor)}"
+                 />
+        </androidx.appcompat.widget.LinearLayoutCompat>
         <ImageButton
             android:id="@+id/buttonStart"
             android:layout_width="70dp"
@@ -79,6 +95,7 @@
                     android:textAlignment="center"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp"
+                    android:textColor="@color/white"
                     android:background="@drawable/rounded_token"
                     android:text="@{viewModel.name}"
                     />
@@ -88,6 +105,7 @@
                     android:layout_height="match_parent"
                     android:textAlignment="center"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:textColor="@color/white"
                     android:textSize="16dp"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp"

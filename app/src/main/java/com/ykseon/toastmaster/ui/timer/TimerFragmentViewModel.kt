@@ -199,11 +199,16 @@ class TimerFragmentViewModel @Inject constructor(
     }
     fun getBgColor(role: String, darkMode: Boolean, shuffle: Int = 0): Color {
         return if (!darkMode) when(role) {
-            SPEAKER_ROLE -> PastelBlue2
-            DEBATE_ROLE -> PastelPink2
-            EVALUATOR_ROLE -> PastelYellow1
-            TABLE_TOPIC_ROLE -> PastelBlue1
-            CREATION_SYSTEM_ROLE -> Color.LightGray
+//            SPEAKER_ROLE -> PastelBlue2
+//            DEBATE_ROLE -> PastelPink2
+//            EVALUATOR_ROLE -> PastelYellow1
+//            TABLE_TOPIC_ROLE -> PastelBlue1
+//            CREATION_SYSTEM_ROLE -> Color.LightGray
+            SPEAKER_ROLE -> PastelDarkBlue2
+            DEBATE_ROLE -> PastelDarkPink2
+            EVALUATOR_ROLE -> PastelDarkYellow1
+            TABLE_TOPIC_ROLE -> PastelDarkBlue1
+            CREATION_SYSTEM_ROLE -> Color.DarkGray
             else -> lightColors[ shuffle % lightColors.size]
         } else when(role) {
             SPEAKER_ROLE -> PastelDarkBlue2

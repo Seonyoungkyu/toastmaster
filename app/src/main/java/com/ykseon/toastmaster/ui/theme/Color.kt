@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 val Purple200 = Color(0xFFBB86FC)
 val PastelBlue1 = Color(0xFF809BCE)
 val PastelBlue2 = Color(0xFFABBBDD)
-val PastelBlue3 = Color(0xFFB1C3EE)
+val PastelBlue3 = Color(0xFF9193EE)
 val PastelBlue4 = Color(0xFFABC4FF)
 val PastelYellow1 = Color(0xFFEFB08F)
 val PastelYellow2 = Color(0xFFEEDD83)
@@ -18,23 +18,33 @@ val PastelDarkBlue1 = Color(0xFF1D6B7B)
 val PastelDarkBlue2 = Color(0xFF52499C)
 val PastelDarkBlue3 = Color(0xFF6565D0)
 val PastelDarkBlue4 = Color(0xFF6754A0)
-val PastelDarkYellow1 = Color(0xFFC47A53)
+val PastelDarkYellow1 = Color(0xFF948A43)
 val PastelDarkYellow2 = Color(0xFFAA9843)
 val PastelDarkYellow3 = Color(0xFF988624)
 val PastelDarkYellow4 = Color(0xFF675623)
 val PastelDarkPink1 = Color(0xFFA83476)
-val PastelDarkPink2 = Color(0x8FED4731)
+val PastelDarkPink2 = Color(0xFF9D3721)
 
 
+//val lightColors = arrayOf(
+//    PastelBlue1,
+//    PastelBlue2,
+//    PastelYellow1,
+//    PastelYellow2,
+//    PastelYellow3,
+//    PastelPink1,
+//    PastelPink2
+//)
 val lightColors = arrayOf(
-    PastelBlue1,
-    PastelBlue2,
-    PastelYellow1,
-    PastelYellow2,
-    PastelYellow3,
-    PastelPink1,
-    PastelPink2
+    PastelDarkBlue1,
+    PastelDarkBlue2,
+    PastelDarkYellow1,
+    PastelDarkYellow2,
+    PastelDarkYellow3,
+    PastelDarkPink1,
+    PastelDarkPink2
 )
+
 
 val darkColors = arrayOf(
     PastelDarkBlue1,

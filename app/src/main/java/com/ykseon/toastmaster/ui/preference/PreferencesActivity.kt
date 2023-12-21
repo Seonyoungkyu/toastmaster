@@ -176,9 +176,9 @@ fun SwitchPreference(
 ) {
     // Define the switch colors based on the switch state
     val switchColors = SwitchDefaults.colors(
-        checkedThumbColor = if(isSystemInDarkTheme()) PastelBlue3 else Color.Blue,
-        checkedTrackColor = if(isSystemInDarkTheme()) Color.LightGray else Color.DarkGray,
-        uncheckedThumbColor = if(isSystemInDarkTheme()) Color.White else Color.Black,
+        checkedThumbColor = Color.White,
+        checkedTrackColor = if (isSystemInDarkTheme()) PastelBlue3 else PastelDarkBlue3,
+        uncheckedThumbColor = Color.White,
         uncheckedTrackColor = if(isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
     )
 

@@ -1,15 +1,13 @@
 package com.ykseon.toastmaster.ui.timer
 
+import android.content.Context
 import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.common.ANONYMOUS
-import com.ykseon.toastmaster.common.DEBATE_ROLE
-import com.ykseon.toastmaster.common.EVALUATOR_ROLE
-import com.ykseon.toastmaster.common.SPEAKER_ROLE
 import com.ykseon.toastmaster.common.SharedState
-import com.ykseon.toastmaster.common.TABLE_TOPIC_ROLE
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
@@ -19,6 +17,7 @@ import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_START_TIMER_IMMEDIATE
 import com.ykseon.toastmaster.model.TimeRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -36,15 +35,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 private const val TAG = "TimerViewModel"
 @HiltViewModel
 class TimerViewModel @Inject constructor(
     private val sharedState: SharedState,
-    private val settingsPreferences: SettingsPreferences
+    private val settingsPreferences: SettingsPreferences,
+    @ApplicationContext context: Context,
 ): ViewModel() {
 
-    private val defaultCutOffs = arrayListOf<Int>(5,10,15,20)
+    private val defaultCutOffs = arrayListOf(5,10,15,20)
     private var cutOffTimes = defaultCutOffs
     private var timeTickUnit = 50
     private var timeMultiply = 1
@@ -54,7 +55,7 @@ class TimerViewModel @Inject constructor(
     private val initState
         get() = 0.toTimerState(cutOffTimes, showRemainingTime.value)
 
-    private val _currentTime = MutableStateFlow<TimerState>(initState)
+    private val _currentTime = MutableStateFlow(initState)
     val currentTime = _currentTime.asStateFlow()
     private var greenMarginalTime = 0
     private var redMarginalTime = 0
@@ -64,6 +65,10 @@ class TimerViewModel @Inject constructor(
     lateinit var cutoffs: String
 
     var defaultBackgroundColor: Int = Color.LTGRAY
+
+    val remainingText = showRemainingTime.map {
+        if (it) context.resources.getText(R.string.remaining_notification) else ""
+    }.stateIn(viewModelScope, Eagerly, "")
 
     val timeText =
         _currentTime
@@ -119,9 +124,22 @@ class TimerViewModel @Inject constructor(
             }
         }
     }
-    private fun TimeInfo.makeTimeString() = "${toTwoDigits(minute)}:${toTwoDigits(second)}"
-    private fun Int.makeTimeString() = "${toTwoDigits(this/60)}:${toTwoDigits(this%60)}"
+    private fun TimeInfo.makeTimeString(): String {
+        return if( minute >= 0 && second >= 0) {
+            "${toTwoDigits(minute)}:${toTwoDigits(second)}"
+        }
+        else {
+            "-${toTwoDigits(abs(minute))}:${toTwoDigits(abs(second))}"
+        }
+    }
 
+    private fun TimeInfo.makeTimeStringForReport(): String {
+
+        val elapsed = tick / 1000
+        val minute = elapsed / 60
+        val second = elapsed % 60
+        return "${toTwoDigits(minute)}:${toTwoDigits(second)}"
+    }
 
     val progress = _currentTime.map {
         if (cutOffTimes.size == 4) {
@@ -224,7 +242,7 @@ class TimerViewModel @Inject constructor(
 
     private fun stop() {
         timerJob?.cancel()
-        _currentTime.value = initState
+        // _currentTime.value = initState
 
         viewModelScope.launch {
             _closeTimer.emit(Unit)
@@ -262,24 +280,13 @@ class TimerViewModel @Inject constructor(
         }
     }
 
-    private fun makeRoleAndCutoffString(): String {
-        val prefix = when (role) {
-            SPEAKER_ROLE -> "S"
-            TABLE_TOPIC_ROLE -> "T"
-            EVALUATOR_ROLE -> "E"
-            DEBATE_ROLE ->"D"
-            else -> " "
-        }
-        return "$prefix $cutoffs"
-    }
-
     private fun recordTime() {
-        val time = _currentTime.value.info.makeTimeString()
+        val time = _currentTime.value.info.makeTimeStringForReport()
         val qualified = _currentTime.value.info.checkQualified()
 
         sharedState.timeRecords.value =
             sharedState.timeRecords.value.plus(
-                TimeRecord( makeRoleAndCutoffString(), name, time, qualified)
+                TimeRecord( role, cutoffs, name, time, qualified)
             )
         viewModelScope.launch {
             val toastString = if (qualified) "$name qualified with a time of $time"
