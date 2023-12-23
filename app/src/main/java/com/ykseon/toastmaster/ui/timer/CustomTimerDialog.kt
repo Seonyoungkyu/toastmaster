@@ -74,7 +74,7 @@ class CustomTimerDialog(
         binding.spinner2.selectString(second)
         binding.spinner3.selectString(third)
         binding.roleSpinner.selectString(item.role)
-        binding.nameEdit.setText(item.name)
+        binding.nameEdit.setText(if (item.name == "Anonymous") "" else item.name)
     }
 
     override fun onCreateView(

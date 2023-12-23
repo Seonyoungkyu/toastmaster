@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -20,7 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -40,14 +41,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -59,9 +66,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ykseon.toastmaster.R
+import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.common.CREATION_SYSTEM_ROLE
-import com.ykseon.toastmaster.ui.contextmenu.ContextMenuItem
-import com.ykseon.toastmaster.ui.contextmenu.ContextMenuPopup
+import com.ykseon.toastmaster.common.compose.ContextMenu
+import com.ykseon.toastmaster.common.compose.ContextMenuItem
+import com.ykseon.toastmaster.common.compose.ContextMenuState
+import com.ykseon.toastmaster.common.compose.SizeTrackingBox
+import com.ykseon.toastmaster.common.isInsideBounds
 import com.ykseon.toastmaster.ui.theme.TimerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -85,7 +96,7 @@ class TimerFragment : Fragment() {
         composeView.setContent {
             TimerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    TimerGridView(timerFragmentViewModel)
+                    TimerCardContentView(timerFragmentViewModel)
                 }
             }
         }
@@ -125,27 +136,73 @@ class TimerFragment : Fragment() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun TimerGridView(viewModel: TimerFragmentViewModel) {
+fun TimerCardContentView(viewModel: TimerFragmentViewModel) {
+
+    var contextMenuState by remember {
+        mutableStateOf( ContextMenuState(false,0,0, -1, listOf()) )
+    }
+    var contextMenuBound by remember { mutableStateOf( Rect(0F,0F,0F,0F)) }
+    var rootSize by remember { mutableStateOf(Size(0F,0F))}
 
     val timerItems = viewModel.timerList.collectAsState()
-    // 그리드뷰 생성
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(100.dp),
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(8.dp)
 
-    ) {
-        items(timerItems.value) { recordItem ->
-            Log.i(TAG,"TimerList - addView ($recordItem.id)")
-            if (recordItem.id != -1L) {
-                TimerCard(viewModel, recordItem)
-            } else {
-                TimerCreationCard(viewModel)
+    SizeTrackingBox(
+        modifier = Modifier
+            .pointerInteropFilter {
+                // 터치 다운 이벤트 처리
+                if (it.action == MotionEvent.ACTION_DOWN) {
+                    Log.i(TAG, "detectTap - ${it.x}, ${it.y}")
+                    if (contextMenuState.show && !Offset(
+                            it.x,
+                            it.y
+                        ).isInsideBounds(contextMenuBound)
+                    ) {
+                        contextMenuState = ContextMenuState(false, 0, 0, -1, listOf())
+                        return@pointerInteropFilter true
+                    }
+                    return@pointerInteropFilter false
+                }
+                false // 이벤트 전파를 막음
             }
+        ,onSizeChanged = { width, height -> rootSize = Size(width, height)}
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(100.dp),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(8.dp)
+
+        ) {
+            items(timerItems.value) { recordItem ->
+                Log.i(TAG, "TimerList - addView ($recordItem.id)")
+                if (recordItem.id != -1L) {
+                    TimerCard(
+                        viewModel,
+                        recordItem
+                    ) { x, y, id, items ->
+                        contextMenuState = ContextMenuState(true, x, y, id, items)
+                    }
+                } else {
+                    TimerCreationCard(viewModel)
+                }
+            }
+
         }
 
+        if (contextMenuState.show) {
+            ContextMenu(
+                touchX = contextMenuState.x,
+                touchY = contextMenuState.y,
+                parentSize = rootSize,
+                id = contextMenuState.id,
+                items = contextMenuState.items,
+                onUpdateMenuBound = { rect -> contextMenuBound = rect.copy()}
+            ) {
+                contextMenuState = ContextMenuState(false,0,0, -1, listOf())
+            }
+        }
     }
 }
 
@@ -176,9 +233,14 @@ fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
+fun TimerCard(
+    viewModel: TimerFragmentViewModel,
+    recordItem: TimerRecordItem,
+    onContextMenu: (Int, Int, Long, List<ContextMenuItem>) -> Unit
+) {
     val context = LocalView.current.context
     var globalOffset by remember { mutableStateOf(Offset(0F, 0F))}
+    var rootOffset by remember { mutableStateOf(Offset(0F, 0F))}
     var longPressCount by remember { mutableIntStateOf(0) }
     var record by remember {mutableStateOf(TimerRecordItem(TimerItem("","", "")))}
     Log.i(TAG,"TimerList - TimerCard id(${recordItem.id}) hash(${recordItem.hashCode()})")
@@ -191,48 +253,42 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
             .aspectRatio(1f)
             .onGloballyPositioned {
                 globalOffset = it.positionInWindow()
+                rootOffset = it.positionInRoot()
             }
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = { offset ->
-                        longPressCount += 1
-                        val rawX = (offset.x + globalOffset.x)
-                        val rawY = (offset.y + globalOffset.y)
-                        Log.i(
-                            TAG,
-                            "TimerList - LongPress (${record.id}) hash(${record.hashCode()})"
-                        )
-                        ContextMenuPopup(
-                            context = context,
-                            items = arrayListOf(
+                        onContextMenu(
+                            (offset.x + rootOffset.x).toInt(),
+                            (offset.y + rootOffset.y).toInt(),
+                            record.id,
+                            arrayListOf(
                                 ContextMenuItem(
                                     context.resources.getString(R.string.context_menu_delete),
-                                ) { popup, obj ->
-                                    val id = (obj as Long)
+                                ) { id ->
                                     viewModel.deleteTimer(id)
-                                    popup.dismiss()
                                 },
                                 ContextMenuItem(
                                     context.resources.getString(R.string.context_menu_edit),
-                                ) { popup, obj ->
-                                    val id = (obj as Long)
+                                ) { id ->
                                     viewModel.editTimer(id)
-                                    popup.dismiss()
                                 },
                                 ContextMenuItem(
                                     context.resources.getString(R.string.context_menu_duplicate),
-                                ) { popup, obj ->
-                                    val id = (obj as Long)
+                                ) { id ->
                                     viewModel.editTimer(id, true)
-                                    popup.dismiss()
                                 }
-                            ),
-                            record.id
-                        ).show(rawX.toInt(), rawY.toInt())
+                            )
+                        )
                     },
                     onTap = {
                         Log.i(TAG, "TimerList - Press (${record.id}) hash(${record.hashCode()})")
-                        viewModel.startTimer(context, record.item.role, record.item.name, record.item.cutoffs)
+                        viewModel.startTimer(
+                            context,
+                            record.item.role,
+                            record.item.name,
+                            record.item.cutoffs
+                        )
                     }
                 )
             },
@@ -271,24 +327,34 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
             verticalArrangement = Arrangement.Center
 
         ) {
-            Text(
-                text = record.item.name,
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    color = Color.White // MaterialTheme.colors.onSurface
-                ),
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = record.item.cutoffs,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.body2.fontSize,
-                    color = Color.White // MaterialTheme.colors.onSurface
+            if (record.item.name != ANONYMOUS) {
+                Text(
+                    text = record.item.name,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = MaterialTheme.typography.body1.fontSize,
+                        color = Color.White // MaterialTheme.colors.onSurface
+                    ),
+                    overflow = TextOverflow.Ellipsis,
                 )
-            )
+                Text(
+                    text = record.item.cutoffs,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MaterialTheme.typography.body2.fontSize,
+                        color = Color.White // MaterialTheme.colors.onSurface
+                    )
+                )
+            } else {
+                Text(
+                    text = record.item.cutoffs,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MaterialTheme.typography.h6.fontSize,
+                        color = Color.White // MaterialTheme.colors.onSurface
+                    )
+                )
+            }
         }
     }
 }
@@ -296,41 +362,38 @@ fun TimerCard(viewModel: TimerFragmentViewModel, recordItem: TimerRecordItem) {
 @Preview
 @Composable
 fun MainContent() {
-    Card(modifier = Modifier.size(120.dp)) {
-        
-        Box(
-            modifier = Modifier.wrapContentSize(align = Alignment.TopStart)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_speaker_foreground),
-                modifier = Modifier.requiredSize(30.dp),
-                contentDescription = "speaker icon",
-            )
-        }
-        Column(
-            modifier = Modifier
-                .wrapContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
 
+    Box (
+        modifier = Modifier
+            .background(
+                color = colorResource(id = R.color.translucent_gray),
+                shape = RoundedCornerShape(6.dp)
+            )
+    ) {
+        Column(modifier = Modifier
+            .padding(0.dp)
+            .wrapContentSize(),
         ) {
-            Text(
-                text = "aa",
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    color = MaterialTheme.colors.onSurface
-                )
+
+            val array = arrayListOf(
+                "Delete",
+                "Edit",
+                "Duplicate"
             )
 
-            Text(
-                text = "BB",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.body2.fontSize,
-                    color = MaterialTheme.colors.onSurface
-                )
-            )
+            for (item in array) {
+                Box (modifier = Modifier.padding(20.dp).widthIn(min = 100.dp)) {
+                    Text(
+                        modifier = Modifier.padding(8.dp).wrapContentSize(),
+                        text = item,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Normal,
+                            fontSize = MaterialTheme.typography.button.fontSize,
+                        ),
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }

@@ -26,6 +26,12 @@
         <item>Sort by creation time</item>
     </string-array>
 
+    <string-array name="context_menu">
+        <item>Delete</item>
+        <item>Edit</item>
+        <item>Duplicate</item>
+    </string-array>
+
     <string-array name="spinner_items">
         <item>Unspecified</item>
         <item>1 min</item>

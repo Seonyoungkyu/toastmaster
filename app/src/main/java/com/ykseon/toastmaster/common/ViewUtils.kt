@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 
 fun AlertDialog.setButtonColor(): AlertDialog {
     val mode = context.resources.configuration.uiMode
@@ -20,4 +22,8 @@ fun AlertDialog.setButtonColor(): AlertDialog {
         getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
     }
     return this
+}
+
+fun Offset.isInsideBounds(rect: Rect): Boolean {
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 }
