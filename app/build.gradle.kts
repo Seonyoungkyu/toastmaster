@@ -73,6 +73,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("com.airbnb.android:lottie:5.0.3")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     ksp("androidx.room:room-compiler:2.6.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

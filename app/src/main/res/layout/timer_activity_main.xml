@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@{safeUnbox(viewModel.backgroundColor)}"
-        tools:context=".ui.timer.TimerFragment">
+        tools:context=".ui.timer.TimerCardsFragment">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/timer_text_layout"

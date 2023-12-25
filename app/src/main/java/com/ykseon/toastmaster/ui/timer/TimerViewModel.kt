@@ -10,12 +10,16 @@ import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.common.SharedState
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BEEP_SOUND
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_GREEN_CARD_POLICY
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER_DETAIL_INFO
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_START_TIMER_IMMEDIATE
 import com.ykseon.toastmaster.model.TimeRecord
+import com.ykseon.toastmaster.ui.theme.StateGreen
+import com.ykseon.toastmaster.ui.theme.StateRed
+import com.ykseon.toastmaster.ui.theme.StateYellow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +29,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +51,7 @@ class TimerViewModel @Inject constructor(
 ): ViewModel() {
 
     private val defaultCutOffs = arrayListOf(5,10,15,20)
-    private var cutOffTimes = defaultCutOffs
+    var cutOffTimes = defaultCutOffs
     private var timeTickUnit = 50
     private var timeMultiply = 1
 
@@ -79,7 +84,7 @@ class TimerViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
 
     // region color change
-    private val _backgroundColor = MutableStateFlow(calculateEndColor(_currentTime.value))
+    private val _backgroundColor = MutableStateFlow(calculateStateColor(_currentTime.value))
     val backgroundColor: StateFlow<Int> = _backgroundColor
     private var colorTransitionJob: Job? = null
     // endregion
@@ -113,6 +118,12 @@ class TimerViewModel @Inject constructor(
         settingsPreferences.saveValue(KEY_SHOW_TIMER_DETAIL_INFO, value)
     }
 
+    fun toggleDetailVisible() {
+        settingsPreferences.saveValue(
+            KEY_SHOW_TIMER_DETAIL_INFO,
+            !detailVisible.value
+            )
+    }
     fun toggleTimerRemaining() {
         settingsPreferences.saveValue(KEY_SHOW_REMAINING_TIME, !showRemainingTime.value)
     }
@@ -151,6 +162,16 @@ class TimerViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
+    val progressValue = _currentTime.map {
+        if (cutOffTimes.size == 4) {
+            val current = it.info.tick
+            val max = cutOffTimes[3] * 1000
+            (current.toFloat()/max)
+        } else {
+            0F
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0F)
+
     val animationTranslation = _currentTime.map {
         if (cutOffTimes.size == 4) {
             val current = it.info.tick
@@ -164,9 +185,8 @@ class TimerViewModel @Inject constructor(
     val timeTextColor =
         _currentTime.map {
             when (it) {
-                is TimerState.Ready -> Color.LTGRAY
-                is TimerState.Expired -> Color.LTGRAY
-                else -> Color.DKGRAY
+                is TimerState.Ready -> Color.WHITE
+                else -> Color.BLACK
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Color.DKGRAY)
 
@@ -176,7 +196,7 @@ class TimerViewModel @Inject constructor(
                 colorTransitionJob?.cancel()
                 colorTransitionJob = viewModelScope.launch {
                     val startColor = _backgroundColor.value
-                    val endColor = calculateEndColor(state)
+                    val endColor = calculateStateColor(state)
                     if (startColor != endColor)
                         animateColorTransition(startColor, endColor, 200, 20)
                 }
@@ -196,14 +216,14 @@ class TimerViewModel @Inject constructor(
         _backgroundColor.value = endColor
     }
 
-    private fun calculateEndColor(state: TimerState): Int {
+    private fun calculateStateColor(state: TimerState): Int {
         return when (state) {
             is TimerState.Initialized -> Color.LTGRAY
             is TimerState.Ready -> Color.DKGRAY
-            is TimerState.Green -> Color.GREEN
-            is TimerState.Yellow -> Color.YELLOW
-            is TimerState.Red -> Color.RED
-            is TimerState.Expired -> Color.DKGRAY
+            is TimerState.Green -> StateGreen
+            is TimerState.Yellow -> StateYellow
+            is TimerState.Red -> StateRed
+            is TimerState.Expired -> StateRed
         }
     }
 
@@ -349,4 +369,7 @@ class TimerViewModel @Inject constructor(
             }
         }
     }
+
+    val beepSound = settingsPreferences.getValue(KEY_BEEP_SOUND, false)
+        .stateIn(viewModelScope, WhileSubscribed(), false)
 }

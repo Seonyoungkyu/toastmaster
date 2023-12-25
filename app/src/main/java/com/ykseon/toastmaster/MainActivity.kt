@@ -13,15 +13,12 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.ykseon.toastmaster.common.SharedState
 import com.ykseon.toastmaster.databinding.ActivityMainBinding
 import com.ykseon.toastmaster.ui.preference.PreferencesActivity
 import com.ykseon.toastmaster.ui.report.ReportActivity
-import com.ykseon.toastmaster.ui.timer.TimerFragment
+import com.ykseon.toastmaster.ui.timer.TimerCardsFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -48,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             val fragmentManager: FragmentManager = supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
-            val fragment = TimerFragment()
+            val fragment = TimerCardsFragment()
 
             fragmentTransaction.add(R.id.fragment_container, fragment)
             fragmentTransaction.commit()

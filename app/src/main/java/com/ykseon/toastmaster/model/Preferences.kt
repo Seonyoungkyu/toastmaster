@@ -52,6 +52,7 @@ class SettingsPreferences @Inject constructor(
         val KEY_SORT_TYPE = intPreferencesKey("sort_type")
         val KEY_ACCELERATION = booleanPreferencesKey("acceleration")
         val KEY_SHOW_REMAINING_TIME = booleanPreferencesKey("show_remaining_time")
+        val KEY_BEEP_SOUND = booleanPreferencesKey("beep_sound")
     }
 }
 

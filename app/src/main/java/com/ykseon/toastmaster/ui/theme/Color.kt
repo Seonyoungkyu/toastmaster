@@ -1,5 +1,6 @@
 package com.ykseon.toastmaster.ui.theme
 
+import androidx.annotation.ColorInt
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)
@@ -25,6 +26,17 @@ val PastelDarkYellow4 = Color(0xFF675623)
 val PastelDarkPink1 = Color(0xFFA83476)
 val PastelDarkPink2 = Color(0xFF9D3721)
 
+val TransparentGray = Color(0x88999999)
+val TransparentDarkGray = Color(0xDD111111)
+
+@ColorInt
+val StateGreen : Int = 0xFF1AA427.toInt()
+
+@ColorInt
+val StateYellow : Int = 0xFFA4A422.toInt()
+
+@ColorInt
+val StateRed : Int = 0xFFC43032.toInt()
 
 //val lightColors = arrayOf(
 //    PastelBlue1,

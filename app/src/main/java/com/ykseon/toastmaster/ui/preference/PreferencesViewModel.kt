@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BEEP_SOUND
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_GREEN_CARD_POLICY
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
@@ -81,6 +82,18 @@ class PreferencesViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, false)
     fun setAcceleration(value: Boolean) {
         settingsPreferences.saveValue(KEY_ACCELERATION, value)
+    }
+    // endregion
+
+
+    // region beep sound
+    val beepSound =
+        settingsPreferences
+            .getValue(KEY_BEEP_SOUND, false)
+            .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    fun setBeepSound(value: Boolean) {
+        settingsPreferences.saveValue(KEY_BEEP_SOUND, value)
     }
     // endregion
 

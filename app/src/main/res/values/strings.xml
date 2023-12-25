@@ -39,5 +39,5 @@
     <string name="green_card_show_option_show_early_judge_early">
         Show green card earlier than the original tim by the buffer time.
     </string>
-    <string name="remaining_notification">This is remaining time.\nTouch to view elapsed time</string>
+    <string name="remaining_notification">This is remaining time.\nTouch to view elapsed time.</string>
 </resources>

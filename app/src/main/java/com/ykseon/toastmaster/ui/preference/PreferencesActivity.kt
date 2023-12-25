@@ -92,6 +92,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val startTimerImmediate = viewModel.startTimerImmediate.collectAsState()
     val bufferTime = viewModel.bufferTime.collectAsState()
     val greenCardPolicy = viewModel.greenCardPolicy.collectAsState()
+    val beepSound = viewModel.beepSound.collectAsState()
     val context = LocalContext.current
 
     Scaffold(
@@ -151,6 +152,12 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                     items = greenCardPolicies,
                     onItemSelected = { viewModel.setGreenCardPolicy(greenCardPolicies.indexOf(it)) },
                     selectedString = greenCardPolicies[greenCardPolicy.value]
+                )
+
+                SwitchPreference(
+                    title = "Beep sound when card changes",
+                    checked = beepSound.value,
+                    onCheckedChange = { viewModel.setBeepSound(it)}
                 )
             }
 

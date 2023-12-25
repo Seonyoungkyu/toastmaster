@@ -60,6 +60,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
@@ -80,9 +81,9 @@ import kotlinx.coroutines.flow.onEach
 
 private const val TAG = "TimerFragment"
 @AndroidEntryPoint
-class TimerFragment : Fragment() {
+class TimerCardsFragment : Fragment() {
 
-    private val timerFragmentViewModel by viewModels<TimerFragmentViewModel>()
+    private val viewModel by viewModels<TimerCardsViewModel>()
     private var dialog: CustomTimerDialog? = null
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -96,7 +97,7 @@ class TimerFragment : Fragment() {
         composeView.setContent {
             TimerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    TimerCardContentView(timerFragmentViewModel)
+                    TimerCardContentView(viewModel)
                 }
             }
         }
@@ -105,20 +106,20 @@ class TimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timerFragmentViewModel.loadTimer(view.context)
+        viewModel.loadTimer(view.context)
 
-        timerFragmentViewModel.showCustomTimerDialog.onEach { info ->
+        viewModel.showCustomTimerDialog.onEach { info ->
             activity?.let {activity ->
                 dialog = CustomTimerDialog(object : CustomTimerDialogCallback {
                     override fun onYesButtonClick(item: TimerItem) {
                         if (info == null) {
-                            timerFragmentViewModel.createItem(item)
+                            viewModel.createItem(item)
                         }else {
                             if (info.duplicate) {
-                                timerFragmentViewModel.createItem(item)
+                                viewModel.createItem(item)
                             }
                             else {
-                                timerFragmentViewModel.updateItemAndReload(info.id, item)
+                                viewModel.updateItemAndReload(info.id, item)
                             }
                         }
 
@@ -139,8 +140,7 @@ class TimerFragment : Fragment() {
 @OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun TimerCardContentView(viewModel: TimerFragmentViewModel) {
-
+fun TimerCardContentView(viewModel: TimerCardsViewModel) {
     var contextMenuState by remember {
         mutableStateOf( ContextMenuState(false,0,0, -1, listOf()) )
     }
@@ -208,7 +208,7 @@ fun TimerCardContentView(viewModel: TimerFragmentViewModel) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
+fun TimerCreationCard(viewModel: TimerCardsViewModel) {
     Card (
         modifier = Modifier
             .padding(4.dp)
@@ -234,7 +234,7 @@ fun TimerCreationCard(viewModel: TimerFragmentViewModel) {
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun TimerCard(
-    viewModel: TimerFragmentViewModel,
+    viewModel: TimerCardsViewModel,
     recordItem: TimerRecordItem,
     onContextMenu: (Int, Int, Long, List<ContextMenuItem>) -> Unit
 ) {

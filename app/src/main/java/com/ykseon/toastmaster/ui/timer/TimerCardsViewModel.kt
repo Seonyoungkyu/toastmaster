@@ -5,7 +5,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat.startActivity
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
@@ -24,14 +23,10 @@ import com.ykseon.toastmaster.data.TimerDAO
 import com.ykseon.toastmaster.data.TimerDatabase
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SORT_TYPE
-import com.ykseon.toastmaster.ui.theme.PastelBlue1
-import com.ykseon.toastmaster.ui.theme.PastelBlue2
 import com.ykseon.toastmaster.ui.theme.PastelDarkBlue1
 import com.ykseon.toastmaster.ui.theme.PastelDarkBlue2
 import com.ykseon.toastmaster.ui.theme.PastelDarkPink2
 import com.ykseon.toastmaster.ui.theme.PastelDarkYellow1
-import com.ykseon.toastmaster.ui.theme.PastelPink2
-import com.ykseon.toastmaster.ui.theme.PastelYellow1
 import com.ykseon.toastmaster.ui.theme.darkColors
 import com.ykseon.toastmaster.ui.theme.lightColors
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,14 +46,14 @@ import javax.inject.Inject
 
 private const val TAG = "TimerFragmentViewModel"
 @HiltViewModel
-class TimerFragmentViewModel @Inject constructor(
+class TimerCardsViewModel @Inject constructor(
     private val sharedState: SharedState,
     private val settingsPreferences: SettingsPreferences
 ) : ViewModel() {
     fun startTimer(context: Context, role:String, name: String, cutoffs: String) {
         startActivity(
             context,
-            Intent(context, TimerActivity::class.java).apply {
+            Intent(context, TimerRunActivity::class.java).apply {
                 putExtra("role", role)
                 putExtra("name", name)
                 putExtra("cutoffs", cutoffs)

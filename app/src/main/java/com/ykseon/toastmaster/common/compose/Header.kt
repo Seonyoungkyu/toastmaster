@@ -29,7 +29,7 @@ fun Header(title: String, onClose: () -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = 2.dp)
                 .background(MaterialTheme.colors.primary),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
