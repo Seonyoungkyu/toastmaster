@@ -50,7 +50,7 @@ class TimerViewModel @Inject constructor(
     @ApplicationContext context: Context,
 ): ViewModel() {
 
-    private val defaultCutOffs = arrayListOf(5,10,15,20)
+    private val defaultCutOffs = arrayListOf(0,0,0,0)
     var cutOffTimes = defaultCutOffs
     private var timeTickUnit = 50
     private var timeMultiply = 1
@@ -81,7 +81,7 @@ class TimerViewModel @Inject constructor(
                 old, new -> old.info.minute == new.info.minute && old.info.second == new.info.second
             }
             .map{it.info.makeTimeString()}
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "00:00")
+            .stateIn(viewModelScope, WhileSubscribed(), "00:00")
 
     // region color change
     private val _backgroundColor = MutableStateFlow(calculateStateColor(_currentTime.value))
@@ -185,8 +185,8 @@ class TimerViewModel @Inject constructor(
     val timeTextColor =
         _currentTime.map {
             when (it) {
-                is TimerState.Ready -> Color.WHITE
-                else -> Color.BLACK
+                is TimerState.Initialized -> Color.BLACK
+                else -> Color.WHITE
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Color.DKGRAY)
 
@@ -368,7 +368,12 @@ class TimerViewModel @Inject constructor(
                 defaultCutOffs
             }
         }
+
+        _currentTime.value = _currentTime.value.info.tick.toTimerState(cutOffTimes, showRemainingTime.value)
+
     }
+
+
 
     val beepSound = settingsPreferences.getValue(KEY_BEEP_SOUND, false)
         .stateIn(viewModelScope, WhileSubscribed(), false)

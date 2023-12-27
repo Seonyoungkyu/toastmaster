@@ -27,7 +27,7 @@ val PastelDarkPink1 = Color(0xFFA83476)
 val PastelDarkPink2 = Color(0xFF9D3721)
 
 val TransparentGray = Color(0x88999999)
-val TransparentDarkGray = Color(0xDD111111)
+val TransparentDarkGray = Color(0xAA111111)
 
 @ColorInt
 val StateGreen : Int = 0xFF1AA427.toInt()

@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
@@ -38,8 +39,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setSupportActionBar(binding.appBarMain.toolbar)
-
         if (savedInstanceState == null) {
 
             val fragmentManager: FragmentManager = supportFragmentManager
@@ -50,25 +49,6 @@ class MainActivity : AppCompatActivity() {
             fragmentTransaction.add(R.id.fragment_container, fragment)
             fragmentTransaction.commit()
         }
-//
-//        binding.appBarMain.fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
-//        }
-//        val navView: NavigationView = binding.navView
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        // Passing each menu ID as a set of Ids because each
-//        // menu should be considered as top level destinations.
-//        appBarConfiguration = AppBarConfiguration(
-//            setOf(
-//                R.id.nav_meeting, R.id.nav_timer, R.id.nav_vote, R.id.nav_roles
-//            ) /*, drawerLayout*/
-//        )
-//
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//        navView.setupWithNavController(navController)
-
-        // checkPermission()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

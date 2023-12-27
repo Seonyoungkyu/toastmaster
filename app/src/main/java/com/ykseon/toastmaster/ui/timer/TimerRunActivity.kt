@@ -272,8 +272,8 @@ fun TimerScreen(viewModel: TimerViewModel) {
             ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = remainingText.toString(), textAlign = Center)
-            TimeText(text = timeText, color = timeTextColor)
+            Text(text = remainingText.toString(), textAlign = Center, color = Color(timeTextColor))
+            TimeText(text = timeText, color = Color(timeTextColor))
         }
 
         Row ( modifier = Modifier
@@ -316,8 +316,8 @@ fun TimerInfoToken(text: String) {
 }
 
 @Composable
-fun TimeText(text: String, color: Int)  {
-    Text( text = text, fontSize = 60.sp, color = Color(color))
+fun TimeText(text: String, color: Color)  {
+    Text( text = text, fontSize = 60.sp, color = color)
 }
 
 @Composable

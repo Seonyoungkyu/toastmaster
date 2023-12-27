@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowBackground">@color/white</item>
         <!-- Customize your theme here. -->
     </style>
     <style name="Theme.ToastMaster.NoActionBar" parent="Theme.ToastMaster">
@@ -21,4 +22,19 @@
     <style name="Theme.ToastMaster.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.ToastMaster.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation
+        duration. -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
+             drawable. One of these is required. -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <!-- Required for animated icons. -->
+        <item name="windowSplashScreenAnimationDuration">200</item>
+        <!-- Set the theme of the Activity that directly follows your splash
+        screen. This is required. -->
+        <item name="postSplashScreenTheme">@style/Theme.ToastMaster</item>
+    </style>
 </resources>
