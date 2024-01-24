@@ -17,6 +17,7 @@ import androidx.navigation.ui.navigateUp
 import com.google.android.material.snackbar.Snackbar
 import com.ykseon.toastmaster.common.SharedState
 import com.ykseon.toastmaster.databinding.ActivityMainBinding
+import com.ykseon.toastmaster.ui.preference.PreferenceUtil
 import com.ykseon.toastmaster.ui.preference.PreferencesActivity
 import com.ykseon.toastmaster.ui.report.ReportActivity
 import com.ykseon.toastmaster.ui.timer.TimerCardsFragment
@@ -33,6 +34,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var sharedState: SharedState
 
+    @Inject
+    lateinit var preferences: PreferenceUtil
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,6 +44,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
+
+            preferences.initPreferences()
 
             val fragmentManager: FragmentManager = supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()

@@ -7,6 +7,7 @@ import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATI
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BEEP_SOUND
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_GREEN_CARD_POLICY
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_ANIMATION
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER_DETAIL_INFO
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SORT_TYPE
@@ -85,7 +86,6 @@ class PreferencesViewModel @Inject constructor(
     }
     // endregion
 
-
     // region beep sound
     val beepSound =
         settingsPreferences
@@ -97,13 +97,23 @@ class PreferencesViewModel @Inject constructor(
     }
     // endregion
 
-    // region accelerate
+    // region remaining time
     val showRemainingTime =
         settingsPreferences
             .getValue(KEY_SHOW_REMAINING_TIME, false)
             .stateIn(viewModelScope, SharingStarted.Lazily, false)
     fun setShowRemainingTime(value: Boolean) {
         settingsPreferences.saveValue(KEY_SHOW_REMAINING_TIME, value)
+    }
+    // endregion
+
+    // region animation
+    val showAnimation =
+        settingsPreferences
+            .getValue(KEY_SHOW_ANIMATION, false)
+            .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    fun setShowAnimation(value: Boolean) {
+        settingsPreferences.saveValue(KEY_SHOW_ANIMATION, value)
     }
     // endregion
 

@@ -13,6 +13,7 @@ import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATI
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BEEP_SOUND
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BUFFER_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_GREEN_CARD_POLICY
+import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_ANIMATION
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_REMAINING_TIME
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_SHOW_TIMER_DETAIL_INFO
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_START_TIMER_IMMEDIATE
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -111,8 +113,16 @@ class TimerViewModel @Inject constructor(
     }
 
     val detailVisible = settingsPreferences
-        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, false)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, true)
+        .stateIn(viewModelScope, WhileSubscribed(), true)
+
+    val animationVisible =settingsPreferences
+        .getValue(KEY_SHOW_TIMER_DETAIL_INFO, true)
+        .combine(
+        settingsPreferences.getValue(KEY_SHOW_ANIMATION, false)
+    ) {
+        detail, animation -> !detail && animation
+    }.stateIn(viewModelScope, WhileSubscribed(), false)
 
     fun setDetailVisible(value: Boolean) {
         settingsPreferences.saveValue(KEY_SHOW_TIMER_DETAIL_INFO, value)

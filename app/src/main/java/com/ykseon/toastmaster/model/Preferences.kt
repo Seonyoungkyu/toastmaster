@@ -13,8 +13,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -32,6 +35,11 @@ class SettingsPreferences @Inject constructor(
         }
     }
 
+    fun <T> getState(key: Preferences.Key<T>, defaultValue: T) =
+        context.dataStore.data.map {
+            it[key] ?: defaultValue
+        }.stateIn(scope, SharingStarted.Eagerly, defaultValue)
+
     suspend fun <T> getValueImmediate(key: Preferences.Key<T>): T? =
         context.dataStore.data.first()[key]
 
@@ -42,6 +50,13 @@ class SettingsPreferences @Inject constructor(
             }
         }
     }
+
+    suspend fun <T> setValueImmediate(key: Preferences.Key<T>, value: T) {
+        context.dataStore.edit {
+            it[key] = value
+        }
+    }
+
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 
@@ -53,6 +68,7 @@ class SettingsPreferences @Inject constructor(
         val KEY_ACCELERATION = booleanPreferencesKey("acceleration")
         val KEY_SHOW_REMAINING_TIME = booleanPreferencesKey("show_remaining_time")
         val KEY_BEEP_SOUND = booleanPreferencesKey("beep_sound")
+        val KEY_SHOW_ANIMATION = booleanPreferencesKey("show_animation")
     }
 }
 

@@ -57,6 +57,7 @@ import com.ykseon.toastmaster.ui.theme.PastelBlue3
 import com.ykseon.toastmaster.ui.theme.PastelDarkBlue3
 import com.ykseon.toastmaster.ui.theme.TimerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -88,6 +89,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val sortTypes = stringArrayResource(id = R.array.sort_type).toList()
     val showTimerDetails = viewModel.showTimerDetails.collectAsState()
     val showRemainingTime = viewModel.showRemainingTime.collectAsState()
+    val showAnimation = viewModel.showAnimation.collectAsState()
     val acceleration = viewModel.acceleration.collectAsState()
     val startTimerImmediate = viewModel.startTimerImmediate.collectAsState()
     val bufferTime = viewModel.bufferTime.collectAsState()
@@ -125,9 +127,14 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                     onCheckedChange = { viewModel.setShowTimerDetails(it) }
                 )
                 SwitchPreference(
-                    title = "Show remaining time ",
+                    title = "Show remaining time",
                     checked = showRemainingTime.value,
                     onCheckedChange = { viewModel.setShowRemainingTime(it) }
+                )
+                SwitchPreference(
+                    title = "Show animation",
+                    checked = showAnimation.value,
+                    onCheckedChange = { viewModel.setShowAnimation(it) }
                 )
             }
 

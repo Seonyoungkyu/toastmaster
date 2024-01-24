@@ -57,6 +57,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.common.beeper.Beeper
+import com.ykseon.toastmaster.common.compose.LottieAnimation
 import com.ykseon.toastmaster.databinding.TimerActivityMainBinding
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.ui.nameinput.NameInputDialog
@@ -179,7 +180,7 @@ fun TimerScreen(viewModel: TimerViewModel) {
     val remainingText by viewModel.remainingText.collectAsState()
     val currentTime by viewModel.currentTime.collectAsState()
     val detailVisible by viewModel.detailVisible.collectAsState()
-
+    val animationVisible by viewModel.animationVisible.collectAsState()
     val cutoffEnd = viewModel.cutOffTimes[3].toFloat()
     val grayRatio = viewModel.cutOffTimes[0].toFloat() / cutoffEnd
     val greenRatio = (viewModel.cutOffTimes[1] - viewModel.cutOffTimes[0]).toFloat() / cutoffEnd
@@ -201,7 +202,29 @@ fun TimerScreen(viewModel: TimerViewModel) {
                 viewModel.toggleDetailVisible()
             }
     ) {
-        val (progress, info, time, button) = createRefs()
+        val (progress, animation, time, button) = createRefs()
+
+        Box (
+            modifier = Modifier
+                .constrainAs(animation) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .padding(start = 30.dp, top = 0.dp, end = 30.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedVisibility(
+                visible = animationVisible,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                LottieAnimation(
+                    modifier = Modifier.size(100.dp),
+                    assetName = "puppy.json"
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
