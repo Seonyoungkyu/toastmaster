@@ -2,12 +2,12 @@ package com.ykseon.toastmaster.ui.timer
 
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykseon.toastmaster.R
 import com.ykseon.toastmaster.common.ANONYMOUS
 import com.ykseon.toastmaster.common.SharedState
+import com.ykseon.toastmaster.common.SystemTimer
 import com.ykseon.toastmaster.model.SettingsPreferences
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_ACCELERATION
 import com.ykseon.toastmaster.model.SettingsPreferences.Companion.KEY_BEEP_SOUND
@@ -60,7 +60,7 @@ class TimerViewModel @Inject constructor(
     private val showRemainingTime = settingsPreferences.getValue(KEY_SHOW_REMAINING_TIME, false)
         .stateIn(viewModelScope, Eagerly, false)
     private val initState
-        get() = 0.toTimerState(cutOffTimes, showRemainingTime.value)
+        get() = 0L.toTimerState(cutOffTimes, showRemainingTime.value)
 
     private val _currentTime = MutableStateFlow(initState)
     val currentTime = _currentTime.asStateFlow()
@@ -146,7 +146,7 @@ class TimerViewModel @Inject constructor(
         }
     }
     private fun TimeInfo.makeTimeString(): String {
-        return if( minute >= 0 && second >= 0) {
+        return if( minute >= 0L && second >= 0L) {
             "${toTwoDigits(minute)}:${toTwoDigits(second)}"
         }
         else {
@@ -248,20 +248,24 @@ class TimerViewModel @Inject constructor(
 
     private var timerJob: Job? = null
 
-    private fun toTwoDigits(number: Int) ="%02d".format(number)
+    private fun toTwoDigits(number: Long) ="%02d".format(number)
 
     private fun start() {
-        var timeTick = 0
         _currentTime.value = TimerState.ready()
+        var timeTick = 0L
+        var timePaused = 0L
+        val systemTimer = SystemTimer().apply { init() }
+
         timerJob = viewModelScope.launch(Dispatchers.Default) {
-            while (true) {
+            while(true) {
                 delay(timeTickUnit.toLong())
                 if (!_currentTime.value.paused) {
-                    timeTick += (timeTickUnit * timeMultiply)
+                    timeTick = timePaused + systemTimer.getElapsedTime().toInt()
+                    timeTick *= timeMultiply
                     _currentTime.value = timeTick.toTimerState(cutOffTimes, showRemainingTime.value)
-                }
-                else {
-                    Log.i(TAG,"TimeTick - paused")
+                } else {
+                    timePaused = timeTick
+                    systemTimer.init()
                 }
             }
         }

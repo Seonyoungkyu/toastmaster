@@ -1,6 +1,6 @@
 package com.ykseon.toastmaster.ui.timer
 
-data class TimeInfo (var minute: Int = 0, var second: Int = 0, var tick: Int = 0)
+data class TimeInfo (var minute: Long = 0L, var second: Long = 0L, var tick: Long = 0L)
 
 sealed class TimerState {
     abstract var paused: Boolean
@@ -29,7 +29,7 @@ sealed class TimerState {
     }
 }
 
-fun Int.toTimerState(cutoffs: List<Int>, reversed: Boolean): TimerState {
+fun Long.toTimerState(cutoffs: List<Int>, reversed: Boolean): TimerState {
     val elapsed = this / 1000
     val remained = cutoffs[3] - elapsed
 
@@ -37,7 +37,7 @@ fun Int.toTimerState(cutoffs: List<Int>, reversed: Boolean): TimerState {
     val minute = presenting / 60
     val second = presenting % 60
     val timeInfo = TimeInfo(minute, second, this)
-    return if (this == 0) TimerState.Initialized(timeInfo)
+    return if (this == 0L) TimerState.Initialized(timeInfo)
         else if (elapsed < cutoffs[0]) TimerState.Ready(timeInfo)
         else if (elapsed < cutoffs[1]) TimerState.Green(timeInfo)
         else if (elapsed < cutoffs[2]) TimerState.Yellow(timeInfo)
